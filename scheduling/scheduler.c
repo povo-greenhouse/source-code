@@ -96,3 +96,8 @@ void timer_interrupt(int elapsed){
 
 }
 
+void scheduler_init(){
+   init_task_list();
+   init_task_queue();
+   scheduler_state = SLEEPING;
+}

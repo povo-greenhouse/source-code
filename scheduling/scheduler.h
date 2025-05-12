@@ -9,6 +9,7 @@
 #define SCHEDULER_H_
 #include "msp.h"
 #include "stdint.h"
+#include "stdbool.h"
 /*
     pointer to routines
  */
@@ -25,7 +26,7 @@ typedef struct{
     TaskFP fpointer;
     int32_t max_time;
     int32_t elapsed_time;
-    int32_t is_active;
+    bool is_active;
 } STask;
 
 
@@ -121,6 +122,7 @@ void scheduler();
  */
 void timer_interrupt(int elapsed);
 
+void scheduler_init();
 
 
 
