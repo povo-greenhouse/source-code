@@ -17,4 +17,8 @@ void main(void)
 	scheduler blink test
 	 */
 	blink_test_init();
+
+	while(1){
+	    __sleep();
+	}
 }

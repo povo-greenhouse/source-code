@@ -23,7 +23,9 @@ void blink_routine(){
     P2->OUT ^= BIT0;
 
 }
-
+void blink_routine_b(){
+    P2->OUT ^= BIT1;
+}
 
 void blink_test_init(){
     sched_test_configurePorts();
@@ -34,7 +36,14 @@ void blink_test_init(){
         1000,
         true
     };
+    STask task2 = {
+       blink_routine_b,
+       2000,
+       2000,
+       true
+    };
     push_task(task);
+    push_task(task2);
 
     //now it should schedule the blink every second
 
