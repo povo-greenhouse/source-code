@@ -2,6 +2,7 @@
 #include "scheduling/scheduler.h"
 #include "scheduling/timer.h"
 #include "scheduling/scheduling_test.h"
+#include "option_menu/option_menu.h"
 /**
  * main.c
  */
@@ -11,7 +12,7 @@ void main(void)
 
 	scheduler_init();
 	timer_init();
-
+	
 	/*
 	scheduler blink test
 	 */

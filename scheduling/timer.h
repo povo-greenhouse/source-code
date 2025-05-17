@@ -29,7 +29,8 @@ inline int32_t compute_countdown(int32_t period,int32_t divider);
 
 void timer_init();
 
-
+void enable_interrupt();
+void disable_interrupt();
 
 void TA0_0_IRQHandler();
 #endif /* TIMER_H_ */
