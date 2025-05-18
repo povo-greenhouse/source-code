@@ -1,8 +1,8 @@
 #include "msp.h"
-#include "scheduling/scheduler.h"
-#include "scheduling/timer.h"
-#include "scheduling/scheduling_test.h"
-#include "option_menu/option_menu.h"
+#include "include/scheduling/scheduler.h"
+#include "include/scheduling/timer.h"
+#include "test/scheduling_test.h"
+#include "include/option_menu/option_menu.h"
 /**
  * main.c
  */

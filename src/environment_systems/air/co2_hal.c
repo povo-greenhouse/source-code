@@ -1,5 +1,9 @@
-#include "co2_hal.h"
+#include "include/environment_systems/air/co2_hal.h"
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include<stdbool.h>
+
 void co2_init(struct CO2 *self){
     self->current_level = 50; // default level
     self->threshold = 500; // default threshold, need to change based on the CO2 sensor

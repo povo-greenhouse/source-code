@@ -1,4 +1,7 @@
-#include<temp_hal.h>
+#include <include/environment_systems/temp_hal.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 void temp_init(TemperatureSensor *self) {
     if (self) {
