@@ -4,9 +4,9 @@
  *  Created on: May 11, 2025
  *      Author: riginel
  */
-#include "timer.h"
+#include "timer.h"  // is this header file from the ti library or your own code?
 #include "msp.h"
-#include "scheduling/timer.h"
+#include "include/scheduling/timer.h"
 
 inline int compute_countdown(int32_t period, int32_t divider) {
     return (32768 / divider) / (1000 / period);

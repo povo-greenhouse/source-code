@@ -5,7 +5,7 @@
  *      Author: riginel
  */
 
-#include "option_menu.h"
+#include "include/option_menu/option_menu.h"
 int32_t push_option(Option option) {
     if (option_list.len == MAX_OPTIONS) {
         return -1;
