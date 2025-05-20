@@ -23,7 +23,7 @@ typedef struct GrowLight{
 }GrowLight;
 
 GrowLight* GrowLight_init();
-void update_light_intensity(GrowLight*);
+void update_light_intensity(GrowLight*,uint8_t sensor_val);
 void update_light_system(GrowLight*, uint8_t);
 
 #endif

@@ -4,7 +4,7 @@
  *  Created on: May 12, 2025
  *      Author: riginel
  */
-#include "scheduling/scheduling_test.h"
+#include "test/scheduling_test.h"
 void sched_test_configurePorts(){
     /* configure P2.0, P2.1 and P2.2 as GPIO */
     P2->SEL0 &= ~(BIT0| BIT1 | BIT2);

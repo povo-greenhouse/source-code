@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <assert.h>
-#include "drivers/air/co2_hal.h"
-
-void test_initialization(CO2 *co2) {
+#include "include/environment_systems/co2_hal.h"
+#include "test/co2_hal_test.h"
+void co2_test_initialization(CO2 *co2) {
     
     co2 = GrowLight_init();
 
@@ -22,7 +22,7 @@ void test_initialization(CO2 *co2) {
 
 }
 
-void test_threshold_operations(CO2 *co2) {
+void co2_test_threshold_operations(CO2 *co2) {
     if(co2 == NULL) {
         printf("CO2 is NULL\n");
         return;
@@ -55,7 +55,7 @@ void test_level_operations(CO2 *co2) {
     co2->set_current_level(co2, 150);
     assert(co2->get_current_level(co2) == 150);
 }
-void test_comparasion_operations(CO2 *co2) {
+void co2_test_comparasion_operations(CO2 *co2) {
     if(co2 == NULL) {
         printf("CO2 is NULL\n");
         return;
@@ -72,13 +72,15 @@ void test_comparasion_operations(CO2 *co2) {
     // assert(co2->is_exceeding_threshold(co2) == false);
     
 }
-int main(){
+
+int co2_test_main(){
     CO2 co2;
 
-    test_initialization(&co2);
-    test_threshold_operations(&co2);
-    test_level_operations(&co2);
-    test_comparasion_operations(&co2);
+    co2_test_initialization(&co2);
+    co2_test_threshold_operations(&co2);
+    co2_test_level_operations(&co2);
+    co2_test_comparasion_operations(&co2);
 
     return 0;
 }
+
