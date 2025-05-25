@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <assert.h>
-#include "drivers/temp/temp_hal.h"
-
-void test_initialization(TemperatureSensor *temp) {
+#include "include/environment_systems/temp_hal.h"
+#include "test/temp_hal_test.h"
+void temp_test_initialization(TemperatureSensor *temp) {
     
     temp = Temperature_init();
 
@@ -24,7 +24,7 @@ void test_initialization(TemperatureSensor *temp) {
     assert(temp->set_current_temperature != NULL);
     assert(temp->would_goldilocks_like_this != NULL);
 }
-void test_threshold_operations(TemperatureSensor *temp) {
+void temp_test_threshold_operations(TemperatureSensor *temp) {
     if(temp == NULL) {
         printf("TemperatureSensor is NULL\n");
         return;
@@ -41,7 +41,7 @@ void test_threshold_operations(TemperatureSensor *temp) {
     temp->set_higher_threshold(temp, 5.0); // should not change
     assert((temp->get_higher_threshold(temp) - 35.0) < 0.0001);
 }
-void test_comparasion_operations(TemperatureSensor *temp) {
+void temp_test_comparasion_operations(TemperatureSensor *temp) {
     if(temp == NULL) {
         printf("TemperatureSensor is NULL\n");
         return;
@@ -55,12 +55,12 @@ void test_comparasion_operations(TemperatureSensor *temp) {
     temp->set_current_temperature(temp, 50.0);
     assert(temp->would_goldilocks_like_this(temp) == 1);
 }
-int main(){
+int temp_test_main(){
     TemperatureSensor temp;
 
-    test_initialization(&temp);
-    test_threshold_operations(&temp);
-    test_comparasion_operations(&temp);
+    temp_test_initialization(&temp);
+    temp_test_threshold_operations(&temp);
+    temp_test_comparasion_operations(&temp);
 
     return 0;
 }

@@ -6,7 +6,7 @@
  */
 
 #include "include/scheduling/scheduler.h"
-#include "timer.h"
+#include "include/scheduling/timer.h"
 
 void init_task_list() { task_list.curr = 0; }
 

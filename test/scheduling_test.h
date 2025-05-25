@@ -10,7 +10,7 @@
 
 
 #include "msp.h"
-#include "scheduling/scheduler.h"
+#include "include/scheduling/scheduler.h"
 void sched_test_configurePorts();
 void blink_routine();
 void blink_test_init();

@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <assert.h>
-#include "drivers/light/led_hal.h"
-
-void test_initialization(GrowLight *light) {
+#include "include/environment_systems/light_system_hal.h"
+#include "test/light_hal_test.h"
+void light_test_initialization(GrowLight *light) {
     
     light = GrowLight_init();
 
@@ -27,7 +27,7 @@ void test_initialization(GrowLight *light) {
     assert(light->is_on != NULL);
 }
 
-void test_brightness_operations(GrowLight *light) {
+void light_test_brightness_operations(GrowLight *light) {
     if(light == NULL) {
         printf("Light is NULL\n");
         return;
@@ -47,7 +47,7 @@ void test_brightness_operations(GrowLight *light) {
     
 }
 
-void test_threshold_operations(GrowLight *light) {
+void light_test_threshold_operations(GrowLight *light) {
     if(light == NULL) {
         printf("Light is NULL\n");
         return;
@@ -61,7 +61,7 @@ void test_threshold_operations(GrowLight *light) {
     assert(light->get_threshold(light) == 0);
 }
 
-void test_mode_operations(GrowLight *light) {
+void light_test_mode_operations(GrowLight *light) {
     if(light == NULL) {
         printf("Light is NULL\n");
         return;
@@ -73,7 +73,7 @@ void test_mode_operations(GrowLight *light) {
     assert(light->get_manual_mode(light) == false);
 
 }
-void test_power_operations(GrowLight *light) {
+void light_test_power_operations(GrowLight *light) {
     if(light == NULL) {
         printf("Light is NULL\n");
         return;
@@ -84,14 +84,16 @@ void test_power_operations(GrowLight *light) {
     light->turn_on(light, false);
     assert(light->is_on(light) == false);
 }
-int main(){
+
+int light_test_main(){
     GrowLight light;
 
-    test_initialization(&light);
-    test_brightness_operations(&light);
-    test_threshold_operations(&light);
-    test_mode_operations(&light);
-    test_power_operations(&light);
+    light_test_initialization(&light);
+    light_test_brightness_operations(&light);
+    light_test_threshold_operations(&light);
+    light_test_mode_operations(&light);
+    light_test_power_operations(&light);
 
     return 0;
 }
+
