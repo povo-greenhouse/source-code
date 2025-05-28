@@ -188,9 +188,10 @@ typedef struct {
   OptionUnion value;
   OnChangeFP on_change_action;
   FmtStringFP to_string;
+  bool changed;
 } Option;
 
-
+int32_t option_get_value(Option * option);
 
 Option option_new(char *name, OptionType type, OptionUnion value,
                   OnChangeFP action,FmtStringFP to_string);

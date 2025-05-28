@@ -28,6 +28,22 @@ int pop_task() {
     }
     return 0;
 }
+int enable_task_at(uint32_t index){
+    if(task_list.curr <=index){
+        return -1;
+    }
+    disable_interrupt();
+    task_list.task_array[index].is_active = true;
+    enable_interrupt();
+}
+int disable_task_at(uint32_t index){
+    if(task_list.curr <=index){
+        return -1;
+    }
+    disable_interrupt();
+    task_list.task_array[index].is_active = false;
+    enable_interrupt();
+}
 
 void init_task_queue() {
 
