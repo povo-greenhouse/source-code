@@ -1,4 +1,4 @@
-/*
+    /*
  * option_menu.c
  *
  *  Created on: May 13, 2025
@@ -80,28 +80,41 @@ void option_change_confirm(){
     }
     return;
 }
+
+
 void option_menu_draw_current_option(){
+    Graphics_clearDisplay(gc);
+
     if(current_setting == -1) {
-        //Graphics_drawStringCentered(gc,(int8_t *)"no option selected", 18, 64,64, OPAQUE_TEXT);
-        printf("no option selected");
+        Graphics_drawStringCentered(gc,(int8_t *)"no option selected", 18, 64,64, OPAQUE_TEXT);
+       // printf("no option selected");
         return;
     }
+    Graphics_Rectangle fill_rect = {
+                                    0,
+                                    50,
+                                    128,
+                                    128,
+
+    };
     Option curr = option_list.arr[current_setting];
-    /*
-    Graphics_drawString(gc,
+    //Graphics_fillRectangle(gc,&fill_rect);
+    Graphics_drawStringCentered(gc,
                         (int8_t *) curr.name,
                                 OPTION_NAME_MAX_LENGTH,
-                                50,
-                                3,
+                                64,
+                                48,
                                 OPAQUE_TEXT);
-    */
-    printf("%s\n",curr.name);
+
+   // printf("%s\n",curr.name);
     char buf[20];
     curr.to_string(buf,option_get_value(&curr),20);
-    printf("%d: ",option_get_value(&curr));
-    //Graphics_drawString(gc,(int8_t *) buf,20,50,100, OPAQUE_TEXT);
+    //printf("%d: ",option_get_value(&curr));
+    Graphics_drawStringCentered(gc,"<",1,32,64, OPAQUE_TEXT);
+    Graphics_drawStringCentered(gc,(int8_t *) buf,20,64,64, OPAQUE_TEXT);
+    Graphics_drawStringCentered(gc,">",1,96,64, OPAQUE_TEXT);
 
-    printf("%s\n",buf);
+    //printf("%s\n",buf);
 
 }
 
@@ -112,6 +125,7 @@ void option_menu_toggle(){
         disable_task_at(option_menu_tasks.display_on_screen);
     }else {
         option_menu_is_enabled = true;
+        Graphics_drawStringCentered(gc, "Option Menu",20,64,20,OPAQUE_TEXT);
         enable_task_at(option_menu_tasks.handle_input);
         enable_task_at(option_menu_tasks.display_on_screen);
     }
@@ -122,31 +136,31 @@ void option_menu_handle_input(){
     case UP: {
         option_menu_nav_prev_option();
         //Graphics_drawStringCentered(gc,"UP PRESSED",11,100,64, OPAQUE_TEXT);
-        printf("UP PRESSED\n");
+        //printf("UP PRESSED\n");
         break;
     }
     case DOWN: {
         option_menu_nav_next_option();
         //Graphics_drawStringCentered(gc,"DOWN PRESSED",13,100,64, OPAQUE_TEXT);
-        printf("DOWN PRESSED\n");
+        //printf("DOWN PRESSED\n");
         break;
     }
     case LEFT: {
         option_menu_decrement_current();
         //Graphics_drawStringCentered(gc,"LEFT PRESSED",13,100,64, OPAQUE_TEXT);
-        printf("LEFT PRESSED\n");
+        //printf("LEFT PRESSED\n");
         break;
     }
     case RIGHT: {
         option_menu_increment_current();
         //Graphics_drawStringCentered(gc,"RIGHT PRESSED",14,100,64, OPAQUE_TEXT);
-        printf("RIGHT PRESSED\n");
+        //printf("RIGHT PRESSED\n");
         break;
     }
     case BUTTON_A:{
         option_change_confirm();
         //Graphics_drawStringCentered(gc,"A PRESSED",10,100,64, OPAQUE_TEXT);
-        printf("A PRESSED\n");
+        //printf("A PRESSED\n");
         break;
     }
     default:{

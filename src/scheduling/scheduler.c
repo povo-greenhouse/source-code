@@ -32,17 +32,17 @@ int enable_task_at(uint32_t index){
     if(task_list.curr <=index){
         return -1;
     }
-    disable_interrupt();
+    disable_timer_interrupt();
     task_list.task_array[index].is_active = true;
-    enable_interrupt();
+    enable_timer_interrupt();
 }
 int disable_task_at(uint32_t index){
     if(task_list.curr <=index){
         return -1;
     }
-    disable_interrupt();
+    disable_timer_interrupt();
     task_list.task_array[index].is_active = false;
-    enable_interrupt();
+    enable_timer_interrupt();
 }
 
 void init_task_queue() {
@@ -72,21 +72,21 @@ TaskFP dequeue_task() {
 }
 
 void scheduler() {
-    disable_interrupt();
+    disable_timer_interrupt();
     TaskFP next = dequeue_task();
-    enable_interrupt();
+    enable_timer_interrupt();
     while (next != 0) {
         next();
-        disable_interrupt();
+        disable_timer_interrupt();
         next = dequeue_task();
-        enable_interrupt();
+        enable_timer_interrupt();
     }
     scheduler_state = SLEEPING;
 }
 
 void timer_interrupt(int elapsed) {
     int scheduled_at_least_once = 0;
-    disable_interrupt();
+    disable_timer_interrupt();
     int i;
 
     for (i = 0; i < task_list.curr; i++) {
@@ -102,10 +102,10 @@ void timer_interrupt(int elapsed) {
             scheduled_at_least_once = 1;
         }
     }
-    enable_interrupt();
+    enable_timer_interrupt();
     if (scheduled_at_least_once && scheduler_state == SLEEPING) {
         scheduler_state = AWAKE;
-        scheduler();
+
     }
 }
 

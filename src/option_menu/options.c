@@ -100,6 +100,7 @@ int32_t option_increment(Option *option) {
         break;
     }
     }
+    option->changed = true;
     return 1;
 }
 int32_t option_decrement(Option *option) {
@@ -128,6 +129,7 @@ int32_t option_decrement(Option *option) {
         break;
     }
     }
+    option->changed=true;
     return 1;
 }
 
@@ -160,6 +162,16 @@ char *timer_option_get_name(t_arr_index index) {
     }
     return OUT_OF_RANGE;
 }
+char * timer_option_get_name_by_value(int32_t value){
+    int i;
+    for(i= 0; i < TIMER_OPTION_ARR_LEN;i++){
+        if(value == timer_option_arr[i].value){
+            return timer_option_arr[i].name;
+
+        }
+    }
+    return OUT_OF_RANGE;
+}
 
 
 void to_string_switch_default(char * buf, int32_t value,size_t buf_len){
@@ -173,6 +185,6 @@ void to_string_threshold_default(char * buf, int32_t value,size_t buf_len){
     snprintf(buf,buf_len, "%d u", value);
 }
 void to_string_timer_default(char * buf, int32_t value,size_t buf_len){
-    snprintf(buf,buf_len,"%.*s",TIMER_AMOUNT_NAME_LEN + 1,timer_option_get_name(value));
+    snprintf(buf,buf_len,"%.*s",TIMER_AMOUNT_NAME_LEN + 1,timer_option_get_name_by_value(value));
     
 }

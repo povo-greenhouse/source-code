@@ -5,8 +5,12 @@
 #include "include/option_menu/option_menu.h"
 #define JOYSTICK_THRESHOLD_UP 10000
 #define JOYSTICK_THRESHOLD_DOWN 6000
-#define JOYSTICK_THRESHOLD_LEFT 13900
-#define JOYSTICK_THRESHOLD_RIGHT 14050
+
+//at rest 7460-7480
+//left:7250-60
+//right:7800
+#define JOYSTICK_THRESHOLD_LEFT 7400
+#define JOYSTICK_THRESHOLD_RIGHT 7550
 
 uint16_t joystick_h_result = 0, joystick_v_result= 0;
 
@@ -212,6 +216,7 @@ void ADC14_IRQHandler(void){
 
 void init_option_menu_input(){
     init_input_queue();
-    adc_init();
     buttons_init();
+    adc_init();
+
 }

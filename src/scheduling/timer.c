@@ -22,10 +22,10 @@ void timer_init() {
 
     // enable irq9 line for the timer interrupt to catch overflow
     // NVIC->ISER[0] = 1 << ((TA0_0_IRQn) & 31);
-    enable_interrupt();
+    enable_timer_interrupt();
 }
-void enable_interrupt() { NVIC->ISER[0] = 1 << ((TA0_0_IRQn) & 31); }
-void disable_interrupt() { NVIC->ISER[0] = 0 << ((TA0_0_IRQn) & 31); }
+void enable_timer_interrupt() { NVIC->ISER[0] = 1 << ((TA0_0_IRQn) & 31); }
+void disable_timer_interrupt() { NVIC->ISER[0] = 0 << ((TA0_0_IRQn) & 31); }
 void TA0_0_IRQHandler() {
 
     TIMER_A0->CCTL[0] &= ~TIMER_A_CCTLN_CCIFG;

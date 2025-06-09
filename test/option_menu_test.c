@@ -33,8 +33,8 @@ void option_menu_test_main(){
 
     STask task2 = {
            blink_routine_b,
-           2000,
-           2000,
+           30000,
+           30000,
            true
     };
     a = push_task(task);
@@ -43,7 +43,8 @@ void option_menu_test_main(){
 
     //OptionList * option_menu = &option_list;
     //creating two new timer options, with 1s and 2s respectively
-    OptionUnion option_u_a = option_u_new_timer("1s",err_a),option_u_b = option_u_new_timer("2s",err_b);
+    OptionUnion option_u_a = option_u_new_timer("1s",&err_a),option_u_b = option_u_new_timer("30s",&err_b);
+
 
     option_menu_push_option(
             option_new("blink a timer",
