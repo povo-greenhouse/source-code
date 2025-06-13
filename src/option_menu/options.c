@@ -24,7 +24,7 @@ TimerAmount timer_option_arr[TIMER_OPTION_ARR_LEN] = {
     {"1h",3600000},
     {"2h",7200000}
 };
-
+char OUT_OF_RANGE[13] =  "out of range";
 
 OptionUnion option_u_new_threshold(int32_t value, int32_t min_value,
                                    int32_t max_value, int32_t increments,
@@ -61,6 +61,7 @@ Option option_new(char *name, OptionType type, OptionUnion value,
     ret.value = value;
     ret.on_change_action = action;
     ret.to_string = to_string;
+    ret.changed = false;
     return ret;
 }
 int32_t option_get_value(Option *option) {
@@ -90,14 +91,16 @@ int32_t option_increment(Option *option) {
     }
     case TIMER: {
         t_arr_index index = option->value.timer;
-        if (index == TIMER_OPTION_ARR_LEN - 1) {
-            option->value.timer = index;
-            break;
+        if (index >= TIMER_OPTION_ARR_LEN - 1) {
+            option->value.timer = TIMER_OPTION_ARR_LEN-1;
+
+        }else{
+            option->value.timer++;
         }
-        option->value.timer++;
         break;
     }
     }
+    option->changed = true;
     return 1;
 }
 int32_t option_decrement(Option *option) {
@@ -117,14 +120,16 @@ int32_t option_decrement(Option *option) {
     }
     case TIMER: {
         t_arr_index index = option->value.timer;
-        if (index == 0) {
-            option->value.timer = index;
-            break;
+        if (index <= 0) {
+            option->value.timer = 0;
+
+        }else{
+            option->value.timer--;
         }
-        option->value.timer--;
         break;
     }
     }
+    option->changed=true;
     return 1;
 }
 
@@ -139,7 +144,7 @@ for the timer it should be different
 int32_t timer_option_get_index(char *str) {
     int i;
     for (i = 0; i < TIMER_OPTION_ARR_LEN; i++) {
-        if (strcmp(str, timer_option_arr[i].name)) {
+        if (!strcmp(str, timer_option_arr[i].name)) {
             return i;
         }
     }
@@ -155,7 +160,17 @@ char *timer_option_get_name(t_arr_index index) {
     if (index >= 0 && index < TIMER_OPTION_ARR_LEN) {
         return timer_option_arr[index].name;
     }
-    return NULL;
+    return OUT_OF_RANGE;
+}
+char * timer_option_get_name_by_value(int32_t value){
+    int i;
+    for(i= 0; i < TIMER_OPTION_ARR_LEN;i++){
+        if(value == timer_option_arr[i].value){
+            return timer_option_arr[i].name;
+
+        }
+    }
+    return OUT_OF_RANGE;
 }
 
 
@@ -170,6 +185,6 @@ void to_string_threshold_default(char * buf, int32_t value,size_t buf_len){
     snprintf(buf,buf_len, "%d u", value);
 }
 void to_string_timer_default(char * buf, int32_t value,size_t buf_len){
-    snprintf(buf,buf_len,"%.*s",TIMER_AMOUNT_NAME_LEN + 1,timer_option_get_name(value));
+    snprintf(buf,buf_len,"%.*s",TIMER_AMOUNT_NAME_LEN + 1,timer_option_get_name_by_value(value));
     
 }

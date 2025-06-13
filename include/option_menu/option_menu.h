@@ -11,8 +11,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include "options.h"
-
-
+//#include <ti/devices/msp432p4xx/driverlib/driverlib.h>
+#include <ti/grlib/grlib.h>
 #define MAX_OPTIONS 20
 /*
     struct representing the list of options
@@ -25,15 +25,19 @@ typedef struct {
     int32_t len;
 }OptionList;
 
-
+/*
+    The global option list for the option menu
+*/
 OptionList option_list;
 
-int32_t current_setting;
+
+
+bool option_menu_is_enabled;
 /*
     initializes the option list
     to be called in main
  */
-void init_option_list();
+void option_menu_init_option_list();
 /*
     pushes an option in the list
     arguments:
@@ -43,7 +47,7 @@ void init_option_list();
     - -1 if the list is full
 
  */
-int32_t push_option(Option option);
+int32_t option_menu_push_option(Option option);
 /*
 
     pops an option from the list
@@ -51,7 +55,15 @@ int32_t push_option(Option option);
     - 1 if it has been removed succesfully
     - -1 if the list's empty
  */
-int32_t pop_option();
+int32_t option_menu_pop_option();
+
+
+
+
+/*
+    index of the current setting pointed to in the menu
+ */
+int32_t current_setting;
 
 /*
     make the current setting pointer go to the next one.
@@ -59,16 +71,24 @@ int32_t pop_option();
     - -1 if current_setting reached the end of the list
     - current_setting index
 */
-int nav_next_option();
+int option_menu_nav_next_option();
 /*
     make the current setting pointer go to the previous one
     returns:
     - -1 if current setting reached the end of the lsit
     - current_setting index
  */
-int nav_prev_option();
+int option_menu_nav_prev_option();
 
 
 
+/*
+    toggles the option menu on or off
+    when it's toggled on
+    - the screen printing and input routines are enabled
+    when it's toggled off
+ */
+void option_menu_toggle();
 
+void option_menu_init(Graphics_Context * graphics_context);
 #endif /* OPTION_MENU_OPTION_MENU_H_ */

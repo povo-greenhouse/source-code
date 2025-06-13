@@ -14,6 +14,7 @@
     pointer to routines
  */
 typedef void (*TaskFP)(void);
+typedef int32_t task_list_index;
 /*
     struct representing a task
     fields:
@@ -62,12 +63,30 @@ returns:
     - the index of the newly placed task in the array
 
  */
-int push_task(STask task);
+task_list_index push_task(STask task);
 /*
 removes the last task on the list
 */
 int pop_task();
 
+/*
+    disable the timer of the task at index, thus removing it's ability to be scheduled periodically
+    arguments:
+    - index: the index of the task
+    return:
+    - 0 if the operation has been done succesfully
+    - -1 if index out of bounds
+*/
+int disable_task_at(uint32_t index);
+/*
+    enable the timer of the task at index, thus it's ability to be scheduled periodically
+    arguments:
+    - index: the index of the task
+    return:
+    - 0 if the operation has been done succesfully
+    - -1 if index out of bounds
+*/
+int enable_task_at(uint32_t index);
 
 
 
