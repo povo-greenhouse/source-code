@@ -1,8 +1,8 @@
 #include <msp.h>
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <stdint.h>
-#include "include/option_menu/option_menu_input.h"
-#include "include/option_menu/option_menu.h"
+#include "option_menu/option_menu_input.h"
+#include "option_menu/option_menu.h"
 #define JOYSTICK_THRESHOLD_UP 10000
 #define JOYSTICK_THRESHOLD_DOWN 6000
 

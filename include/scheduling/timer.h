@@ -10,7 +10,7 @@
 
 
 #include "msp.h"
-#include "include/scheduling/scheduler.h"
+#include "scheduling/scheduler.h"
 #include "stdint.h"
 
 

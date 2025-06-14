@@ -6,14 +6,14 @@
  */
 
 #include "msp.h"
-#include "include/scheduling/timer.h"
+#include "scheduling/timer.h"
 
 inline int compute_countdown(int32_t period, int32_t divider) {
     return (3000000 / divider) / (1000 / period);
 }
 
 void timer_init() {
-    
+
     TIMER_A0->CTL = TIMER_A_CTL_SSEL__SMCLK;
     TIMER_A0->CTL |= TIMER_A_CTL_MC__UP;
     TIMER_A0->CTL |= TIMER_A_CTL_ID_3;

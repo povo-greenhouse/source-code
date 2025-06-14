@@ -1,4 +1,4 @@
-#include "include/option_menu/options.h"
+#include "option_menu/options.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -186,5 +186,5 @@ void to_string_threshold_default(char * buf, int32_t value,size_t buf_len){
 }
 void to_string_timer_default(char * buf, int32_t value,size_t buf_len){
     snprintf(buf,buf_len,"%.*s",TIMER_AMOUNT_NAME_LEN + 1,timer_option_get_name_by_value(value));
-    
+
 }

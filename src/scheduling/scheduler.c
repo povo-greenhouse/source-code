@@ -5,8 +5,8 @@
  *      Author: riginel
  */
 
-#include "include/scheduling/scheduler.h"
-#include "include/scheduling/timer.h"
+#include "scheduling/scheduler.h"
+#include "scheduling/timer.h"
 
 void init_task_list() { task_list.curr = 0; }
 
