@@ -3,6 +3,7 @@
 - run the mq135 for 12 hours
 - see if mq135 sensor is working and the values it gives in different environments
 - add pwd for leds
+- explain the code in the comments of the functions
 - create a file for the option menu actions (join the tasks)
 - ~see how to add the update functions to the stack of the scheduler~
 - ~add schedule for all sensors~
