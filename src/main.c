@@ -41,7 +41,7 @@ void main(void)
 	_graphicsInit();
 	scheduler_init();
 	timer_init();
-	init_option_menu(&g_sContext);
+	option_menu_init(&g_sContext);
 	
 
 	//blink_test_init();
