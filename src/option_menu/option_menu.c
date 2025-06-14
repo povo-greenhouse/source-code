@@ -168,7 +168,7 @@ void option_menu_handle_input(){
     }
     }
 }
-void init_option_menu(Graphics_Context * graphics_context){
+void option_menu_init(Graphics_Context * graphics_context){
     gc = graphics_context;
     option_menu_init_option_list();
     init_option_menu_input();
