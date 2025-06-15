@@ -12,6 +12,4 @@ void light_test_update();
 int light_test_main();
 
 
-
-
 #endif

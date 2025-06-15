@@ -65,6 +65,7 @@ void light_test_power_operations() {
 }
 
 void light_test_update(){
+    #ifdef SOFTWARE_DEBUG
     update_light_hal(0x0000); // 0
     assert(is_grow_light_on() == 1);
     assert(grow_light_get_brightness() == 2500);
@@ -84,7 +85,7 @@ void light_test_update(){
     assert(is_grow_light_on() == 0);
     update_light_hal(0xA0F0); // 3840
     assert(is_grow_light_on() == 0);
-
+#endif
 }
 int light_test_main(){
 

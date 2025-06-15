@@ -1,6 +1,7 @@
 #include "msp.h"
 #include "environment_systems/temperature.h"
 #include "light_system/growing_light.h"
+#include "environment_systems/air_quality.h"
 #include "scheduling/scheduler.h"
 #include "scheduling/timer.h"
 #include "../test/scheduling_test.h"
@@ -39,25 +40,26 @@ void initialize_system(){
     _graphicsInit();
     scheduler_init();
     timer_init();
-//    init_option_menu(&g_sContext);
+    option_menu_init(&g_sContext);
 
     I2C_init();
     Init_I2C_GPIO();
     grow_light_init();
     temp_sensor_init();
+    air_init();
 }
 
-//void main(void){
-//    WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;     // stop watchdog timer
-//
-//    initialize_system();
-//
-//    while(1){
-//        if(scheduler_state == AWAKE){
-//            scheduler();
-//        }
-//        __WFI();
-//    }
+void main(void){
+    WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;     // stop watchdog timer
+
+    initialize_system();
+
+    while(1){
+        if(scheduler_state == AWAKE){
+            scheduler();
+        }
+        __WFI();
+    }
 //    Interrupt_disableMaster();
 //
 //    PCM_setCoreVoltageLevel(PCM_VCORE1);
@@ -67,11 +69,11 @@ void initialize_system(){
 //
 //    CS_setDCOCenteredFrequency(CS_DCO_FREQUENCY_3);
 //    CS_initClockSignal(CS_MCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
-//
+
 //    while (1) {
 //        update_temperature();
 //        update_light();
 //        volatile int i=0;
 //        for(;i<10000;i++);
 //    }
-//}
+}

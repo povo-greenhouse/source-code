@@ -64,6 +64,7 @@ Option option_new(char *name, OptionType type, OptionUnion value,
     ret.changed = false;
     return ret;
 }
+
 int32_t option_get_value(Option *option) {
     switch (option->type) {
     case SWITCH:
@@ -73,7 +74,9 @@ int32_t option_get_value(Option *option) {
     case TIMER:
         return timer_option_get_value(option->value.timer);
     }
+    return -1;
 }
+
 int32_t option_increment(Option *option) {
     switch (option->type) {
     case SWITCH:

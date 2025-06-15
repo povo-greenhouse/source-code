@@ -35,7 +35,9 @@ int enable_task_at(uint32_t index){
     disable_timer_interrupt();
     task_list.task_array[index].is_active = true;
     enable_timer_interrupt();
+    return 0;
 }
+
 int disable_task_at(uint32_t index){
     if(task_list.curr <=index){
         return -1;
@@ -43,6 +45,7 @@ int disable_task_at(uint32_t index){
     disable_timer_interrupt();
     task_list.task_array[index].is_active = false;
     enable_timer_interrupt();
+    return 0;
 }
 
 void init_task_queue() {
