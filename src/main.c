@@ -50,30 +50,20 @@ void initialize_system(){
 }
 
 void main(void){
-    WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;     // stop watchdog timer
+  
+	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
+	_graphicsInit();
+	scheduler_init();
+	timer_init();
+	option_menu_init(&g_sContext);
+	
 
-    initialize_system();
-
-    while(1){
-        if(scheduler_state == AWAKE){
-            scheduler();
-        }
-        __WFI();
-    }
-//    Interrupt_disableMaster();
-//
-//    PCM_setCoreVoltageLevel(PCM_VCORE1);
-//
-//    FlashCtl_setWaitState(FLASH_BANK0, 2);
-//    FlashCtl_setWaitState(FLASH_BANK1, 2);
-//
-//    CS_setDCOCenteredFrequency(CS_DCO_FREQUENCY_3);
-//    CS_initClockSignal(CS_MCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
-
-//    while (1) {
-//        update_temperature();
-//        update_light();
-//        volatile int i=0;
-//        for(;i<10000;i++);
-//    }
+	//blink_test_init();
+	option_menu_test_main();
+	while(1){
+	    if(scheduler_state ==AWAKE){
+	        scheduler();
+	    }
+	    __WFI();
+	}
 }
