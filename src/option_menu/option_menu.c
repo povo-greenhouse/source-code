@@ -5,11 +5,11 @@
  *      Author: riginel
  */
 
-#include "include/option_menu/option_menu.h"
-#include "include/option_menu/option_menu_input.h"
+#include "option_menu/option_menu.h"
+#include "option_menu/option_menu_input.h"
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <ti/grlib/grlib.h>
-#include "include/scheduling/scheduler.h"
+#include "scheduling/scheduler.h"
 Graphics_Context * gc;
 
 struct {
@@ -179,4 +179,3 @@ void option_menu_init(Graphics_Context * graphics_context){
 
 
 }
-

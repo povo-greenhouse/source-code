@@ -5,11 +5,11 @@
  *      Author: riginel
  */
 
-#include "include/option_menu/option_menu.h"
-#include "include/option_menu/options.h"
-#include "include/scheduling/scheduler.h"
-#include "test/scheduling_test.h"
-#include "test/option_menu_test.h"
+#include "option_menu/option_menu.h"
+#include "option_menu/options.h"
+#include "scheduling/scheduler.h"
+#include "scheduling_test.h"
+#include "option_menu_test.h"
 #include <stdint.h>
 task_list_index a,b;
 

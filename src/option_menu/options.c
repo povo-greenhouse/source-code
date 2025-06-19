@@ -1,4 +1,4 @@
-#include "include/option_menu/options.h"
+#include "option_menu/options.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -64,6 +64,7 @@ Option option_new(char *name, OptionType type, OptionUnion value,
     ret.changed = false;
     return ret;
 }
+
 int32_t option_get_value(Option *option) {
     switch (option->type) {
     case SWITCH:
@@ -73,7 +74,9 @@ int32_t option_get_value(Option *option) {
     case TIMER:
         return timer_option_get_value(option->value.timer);
     }
+    return -1;
 }
+
 int32_t option_increment(Option *option) {
     switch (option->type) {
     case SWITCH:
@@ -186,5 +189,5 @@ void to_string_threshold_default(char * buf, int32_t value,size_t buf_len){
 }
 void to_string_timer_default(char * buf, int32_t value,size_t buf_len){
     snprintf(buf,buf_len,"%.*s",TIMER_AMOUNT_NAME_LEN + 1,timer_option_get_name_by_value(value));
-    
+
 }
