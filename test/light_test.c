@@ -57,10 +57,10 @@ void light_test_mode_operations(){
 }
 void light_test_power_operations() {
 
-    power_on_or_off();
+    power_on_or_off(1);
     assert(is_grow_light_on() == true);
 
-    power_on_or_off();
+    power_on_or_off(0);
     assert(is_grow_light_on() == false);
 }
 

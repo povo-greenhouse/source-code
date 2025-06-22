@@ -37,7 +37,7 @@ void option_menu_disable_interrupts(){
 
 //enqueues the given task
 int input_buffer_enqueue(ControllerInputOption input){
-    if(!option_menu_is_enabled) {return;}
+    if(!option_menu_is_enabled) {return -1;}
     option_menu_disable_interrupts();
 
 

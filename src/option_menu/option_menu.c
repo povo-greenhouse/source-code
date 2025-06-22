@@ -90,13 +90,13 @@ void option_menu_draw_current_option(){
        // printf("no option selected");
         return;
     }
-    Graphics_Rectangle fill_rect = {
-                                    0,
-                                    50,
-                                    128,
-                                    128,
-
-    };
+//    Graphics_Rectangle fill_rect = {
+//                                    0,
+//                                    50,
+//                                    128,
+//                                    128,
+//
+//    };
     Option curr = option_list.arr[current_setting];
     //Graphics_fillRectangle(gc,&fill_rect);
     Graphics_drawStringCentered(gc,
@@ -133,39 +133,39 @@ void option_menu_toggle(){
 void option_menu_handle_input(){
     ControllerInputOption input = input_buffer_dequeue();
     switch(input){
-    case UP: {
-        option_menu_nav_prev_option();
-        //Graphics_drawStringCentered(gc,"UP PRESSED",11,100,64, OPAQUE_TEXT);
-        //printf("UP PRESSED\n");
-        break;
-    }
-    case DOWN: {
-        option_menu_nav_next_option();
-        //Graphics_drawStringCentered(gc,"DOWN PRESSED",13,100,64, OPAQUE_TEXT);
-        //printf("DOWN PRESSED\n");
-        break;
-    }
-    case LEFT: {
-        option_menu_decrement_current();
-        //Graphics_drawStringCentered(gc,"LEFT PRESSED",13,100,64, OPAQUE_TEXT);
-        //printf("LEFT PRESSED\n");
-        break;
-    }
-    case RIGHT: {
-        option_menu_increment_current();
-        //Graphics_drawStringCentered(gc,"RIGHT PRESSED",14,100,64, OPAQUE_TEXT);
-        //printf("RIGHT PRESSED\n");
-        break;
-    }
-    case BUTTON_A:{
-        option_change_confirm();
-        //Graphics_drawStringCentered(gc,"A PRESSED",10,100,64, OPAQUE_TEXT);
-        //printf("A PRESSED\n");
-        break;
-    }
-    default:{
-        break;
-    }
+        case UP: {
+            option_menu_nav_prev_option();
+            //Graphics_drawStringCentered(gc,"UP PRESSED",11,100,64, OPAQUE_TEXT);
+            //printf("UP PRESSED\n");
+            break;
+        }
+        case DOWN: {
+            option_menu_nav_next_option();
+            //Graphics_drawStringCentered(gc,"DOWN PRESSED",13,100,64, OPAQUE_TEXT);
+            //printf("DOWN PRESSED\n");
+            break;
+        }
+        case LEFT: {
+            option_menu_decrement_current();
+            //Graphics_drawStringCentered(gc,"LEFT PRESSED",13,100,64, OPAQUE_TEXT);
+            //printf("LEFT PRESSED\n");
+            break;
+        }
+        case RIGHT: {
+            option_menu_increment_current();
+            //Graphics_drawStringCentered(gc,"RIGHT PRESSED",14,100,64, OPAQUE_TEXT);
+            //printf("RIGHT PRESSED\n");
+            break;
+        }
+        case BUTTON_A:{
+            option_change_confirm();
+            //Graphics_drawStringCentered(gc,"A PRESSED",10,100,64, OPAQUE_TEXT);
+            //printf("A PRESSED\n");
+            break;
+        }
+        default:{
+            break;
+        }
     }
 }
 void option_menu_init(Graphics_Context * graphics_context){
