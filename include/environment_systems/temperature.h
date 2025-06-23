@@ -2,18 +2,20 @@
 #define INCLUDE_ENVIRONMENT_SYSTEMS_TEMPERATURE_H_
 
 #include <stdint.h>
+#include "scheduling/scheduler.h"
 
 #ifndef SOFTWARE_DEBUG
-/// defining the I2C address of the TMP006 sensor
-#define TMP006_SLAVE_ADDRESS    0x40
 
 /*******************************************
  *  defining the TMP006 register addresses *
  *******************************************/ 
+// I2C address of the TMP006 sensor
+#define TMP006_SLAVE_ADDRESS    0x40
 // register address for the ambient temperature
 #define TMP006_P_TABT           0x01
 // register address to write to the TMP006 sensor (to set configuration settings)
 #define TMP006_WRITE_REG        0x02
+
 
 /*********************************************************
  *  defining the TMP006 configuration settings registers *
@@ -27,13 +29,6 @@
 // bit to set the conversion rate to 2Hz
 #define TMP006_CR_2             0x0200
 
-
-/***********************
- * pins for the buzzer *
- ***********************/ 
-
-#define BUZZER_PORT     P2
-#define BUZZER_PIN      BIT7
 #endif
 
 /// @brief Structure to hold temperature sensor data.
@@ -43,10 +38,13 @@
 /// - higher_threshold: The upper limit for the temperature range.
 ///
 /// - lower_threshold: The lower limit for the temperature range.
+///
+/// - stack_pos: position in the stack of the scheduler.
 typedef struct TemperatureSensor{
     int8_t current_temperature;
     int8_t higher_threshold;
     int8_t lower_threshold;
+    task_list_index stack_pos;
 }TemperatureSensor;
 
 /// @brief Initializes the temperature sensor and buzzer, sets up the I2C communication, 
@@ -96,4 +94,8 @@ int8_t would_goldilocks_like_this();
 /// and checks if the temperature is within the acceptable range.
 /// The buzzer is activated if the temperature is out of range, to indicate that the temperature is not suitable for the plants.
 void update_temperature();
+
+/// @brief Function to update the timer associated with the update temperature sensor value task.
+/// It sets the new timer value in the scheduler.
+void update_temperature_timer(int32_t);
 #endif
