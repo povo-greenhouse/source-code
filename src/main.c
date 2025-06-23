@@ -5,6 +5,7 @@
 #include "scheduling/scheduler.h"
 #include "scheduling/timer.h"
 #include "../test/scheduling_test.h"
+#include "../test/option_menu_test.h"
 #include "option_menu/option_menu.h"
 #include <stdio.h>
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>

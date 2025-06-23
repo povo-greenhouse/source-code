@@ -9,8 +9,7 @@
 #define TEST_SCHEDULING_TEST_H_
 
 
-#include "msp.h"
-#include "scheduling/scheduler.h"
+
 void sched_test_configurePorts();
 void blink_routine();
 void blink_routine_b();
