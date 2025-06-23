@@ -3,7 +3,10 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "scheduling/scheduler.h"
 
+#define LED_PORT P2
+#define LED_BIT BIT5
 // address of the OPT3001 light sensor
 #define OPT3001_SLAVE_ADDRESS 0x44
 
@@ -24,7 +27,7 @@
 #define DEFAULT_CONFIG_100 0xC410 // 100ms
 
 /******************************************************
- *  defining the thtreshold values for the grow light *
+ *  defining the threshold values for the grow light *
  ******************************************************/
 // maximum brightness value for the grow light
 #define MAX_BRIGHTNESS 2500
@@ -41,11 +44,14 @@
 /// - manual_mode: A flag indicating whether the grow light is in manual mode.
 ///
 /// - on: A flag indicating whether the grow light is currently turned on or off.
+///
+/// - stack_pos: position in the stack of the scheduler
 typedef struct GrowLight{
     uint32_t current_brightness;
     uint32_t threshold;
     bool manual_mode;
     bool on;
+    task_list_index stack_pos;
 }GrowLight;
 
 /// @brief Initializes the grow light system.
@@ -84,7 +90,7 @@ uint32_t grow_light_get_threshold();
 /// @brief Sets the mode of the grow light system.
 /// If manual mode is enabled, the grow light system will be handed to the user to perform manual adjustments.
 /// @param  manual_mode mode to set for the grow light system (true for manual mode, false for automatic mode).
-void grow_light_set_mode(bool);
+void grow_light_set_mode(int32_t);
 
 /// @brief Retrieves the current mode of the grow light system.
 /// @return current mode of opertion of the grow light system (true for manual mode, false for automatic mode).
@@ -93,7 +99,7 @@ bool grow_light_get_mode();
 /// @brief Toggles the power state of the grow light.
 /// If the grow light is currently on, it will be turned off throught the GPIO pin, and vice versa.
 /// This function also updates the structure value to reflect the current power state of the grow light.
-void power_on_or_off();
+void power_on_or_off(int32_t);
 
 /// @brief Indicates whether the grow light is currently turned on or off.
 /// @return true if the grow light is on, false if it is off.
@@ -122,5 +128,9 @@ void update_light();
 /// @param raw The raw sensor value read from the user in hexadecimal format.
 void update_light_hal(uint32_t);
 #endif
+
+/// @brief Updates the light timer with the specified time.
+/// This function sets the timer value for the grow light system, which determines how often the light system is updated.
+void update_light_timer(int32_t);
 
 #endif

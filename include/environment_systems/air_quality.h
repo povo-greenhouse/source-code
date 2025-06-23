@@ -3,15 +3,19 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "scheduling/scheduler.h"
 
 /// @brief Structure to hold air quality data.
 ///
 /// - threshold: The level over which the air quality is considered poor.
 ///
 /// - current_level: The current air quality level measured by the sensor.
+///
+/// - stack_pos: position in the stack of the scheduler.
 typedef struct Air{
     uint32_t threshold;
     uint32_t current_level;
+    task_list_index stack_pos;
 }Air;
 
 /// @brief Sets up the GPIO pin for the air quality sensor, 
@@ -47,5 +51,9 @@ bool exceeding_threshold();
 ///
 /// This function is called periodically by the scheduler to ensure the air quality is monitored continuously. 
 void update_air();
+
+/// @brief Function to update the timer associated with the update air quality sensor values task.
+/// It sets the new timer value in the scheduler.
+void update_air_timer(int32_t);
 
 #endif
