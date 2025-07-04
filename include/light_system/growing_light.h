@@ -5,8 +5,11 @@
 #include <stdbool.h>
 #include "scheduling/scheduler.h"
 
-#define LED_PORT P2
-#define LED_BIT BIT5
+#define LED_PORT GPIO_PORT_P1
+#define LED_PIN GPIO_PIN0
+
+#define CCR1_PORT GPIO_PORT_P7
+#define CCR1_PIN GPIO_PIN7
 // address of the OPT3001 light sensor
 #define OPT3001_SLAVE_ADDRESS 0x44
 
@@ -32,7 +35,7 @@
 // maximum brightness value for the grow light
 #define MAX_BRIGHTNESS 2500
 // minimum brightness value for the grow light
-#define MIN_BRIGHTNESS 500
+#define MIN_BRIGHTNESS 1000
 
 /// @brief Structure to hold the grow light system data.
 ///
@@ -133,4 +136,7 @@ void update_light_hal(uint32_t);
 /// This function sets the timer value for the grow light system, which determines how often the light system is updated.
 void update_light_timer(int32_t);
 
+/// @brief Timer_A1 interrupt handler for the grow light system.
+/// This function is called when the Timer_A1 interrupt occurs, toggling the LED state.
+void TA1_N_IRQHandler(void);
 #endif
