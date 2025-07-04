@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
-
+#include "IOT/IOT_communication.h"
 #ifndef SOFTWARE_DEBUG
 #include "msp.h"
 #include "ti/devices/msp432p4xx/driverlib/driverlib.h"
@@ -203,7 +203,17 @@ void update_light_intensity(uint32_t sensor_val){
         calculated_brightness = 0;
         gl.on = false;
     } else {
-        calculated_brightness = ((gl.threshold - sensor_val) * 4 * MAX_BRIGHTNESS) / gl.threshold; // [0,10000]
+       calculated_brightness = ((gl.threshold - sensor_val) * 4 * MAX_BRIGHTNESS) / gl.threshold; // [0,10000]
+        if (calculated_brightness >= 1000 && calculated_brightness <= 1500) {
+            send_data(5,0,2);
+        }
+        else if (calculated_brightness >= 500 && calculated_brightness < 1000) {
+            send_data(5,0,3);
+        }
+        else if (calculated_brightness >= 0 && calculated_brightness < 500) {
+            send_data(5,0,4);
+        }
+        send_data(5,1,0);
         gl.on = true;
     }
 

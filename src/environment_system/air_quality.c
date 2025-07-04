@@ -2,7 +2,7 @@
 #include "environment_systems/temperature.h"
 #include "environment_systems/buzzer_utils.h"
 #include "scheduling/scheduler.h"
-
+#include "IOT/IOT_communication.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -110,11 +110,14 @@ void update_air(){
     if(exceeding){ // Turns buzzer on if threshold is exceeded
 
         // calling function to activate the buzzer
+         send_data(1,0,1);
+        send_data(1,1,0);
         turn_on_buzzer();
 
     } else {
 
         //calling function to deactivate buzzer
+        send_data(1,0,2);
         turn_off_buzzer(would_goldilocks_like_this(), exceeding);
 
     }
