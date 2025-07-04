@@ -71,7 +71,7 @@ void clear_input_queue(){
     for(a = input_buffer_dequeue(); a != NONE; a= input_buffer_dequeue());
 }
 
-
+#ifdef ADC_OPTION_MENU_WORKS
 void adc_init(){
     /* Configures Pin 6.0 and 4.4 as ADC input(vertical and horizontal joystick) */
     GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P6,GPIO_PIN0,GPIO_TERTIARY_MODULE_FUNCTION);
@@ -102,6 +102,7 @@ void adc_init(){
     ADC14_toggleConversionTrigger();
 }
 
+#endif
 void buttons_init(){
     //BUTTON A INPUT: PIN 5.1
 
@@ -197,6 +198,8 @@ void add_to_input_buffer(ControllerInputOption input){
     last_input = input;
     return;
 }
+#ifdef ADC_OPTION_MENU_WORKS
+
 void ADC14_IRQHandler(void){
     uint64_t status = ADC14_getEnabledInterruptStatus();
     ADC14_clearInterruptFlag(status);
@@ -213,7 +216,7 @@ void ADC14_IRQHandler(void){
     }
 
 }
-
+#endif
 void init_option_menu_input(){
     init_input_queue();
     buttons_init();

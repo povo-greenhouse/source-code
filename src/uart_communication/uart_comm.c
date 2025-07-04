@@ -2,7 +2,7 @@
 #include <ti/drivers/UART.h>
 #include "uart_communication/uart_comm.h"
 #include <string.h>
-char read_buf[READ_BUF_LEN];
+char uart_read_buf[UART_READ_BUF_LEN];
 
 
 void uart_read_callback(UART_Handle handle, void *buf, size_t count);
@@ -22,7 +22,7 @@ UART_Handle uart_init(){
     params.readCallback =uart_read_callback;
     params.writeCallback =uart_write_callback;
     //open the UART
-    UART_Handle uart = UART_open(CONFIG_UART0, &params);
+    //UART_Handle uart = UART_open(CONFIG_UART0, &params);
 
 
 
