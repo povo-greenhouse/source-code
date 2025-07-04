@@ -13,7 +13,7 @@
 #include <ti/grlib/grlib.h>
 
 #include "../lib/HAL_I2C.h"
-#include "../include/LcdDriver/Crystalfontz128x128_ST7735.h"
+#include "LcdDriver/Crystalfontz128x128_ST7735.h"
 
 Graphics_Context g_sContext;
 
