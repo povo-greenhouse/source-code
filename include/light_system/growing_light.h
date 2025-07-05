@@ -35,7 +35,7 @@
 // maximum brightness value for the grow light
 #define MAX_BRIGHTNESS 2500
 // minimum brightness value for the grow light
-#define MIN_BRIGHTNESS 1000
+#define MIN_BRIGHTNESS 500
 
 /// @brief Structure to hold the grow light system data.
 ///
