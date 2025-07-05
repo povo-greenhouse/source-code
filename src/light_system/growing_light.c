@@ -2,6 +2,8 @@
 
 #include "light_system/growing_light.h"
 #include "scheduling/scheduler.h"
+#include "IOT/IOT_communication.h"
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -113,6 +115,16 @@ void grow_light_set_brightness(uint32_t brightness){
     printf("PWM Brightness set to %lu\n", brightness);
 #endif
 
+    if (brightness >= 2000 && brightness <= 2500) {
+        send_data(5,0,2);
+    } else if (brightness >= 500 && brightness < 2000) {
+        send_data(5,0,3);
+    } else if (brightness >= 0 && brightness < 500) {
+        send_data(5,0,4);
+    }
+    send_data(5,1,0);
+
+    return;
 }
 
 void grow_light_set_threshold(uint32_t new_threshold){

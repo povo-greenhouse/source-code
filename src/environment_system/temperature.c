@@ -2,6 +2,7 @@
 #include "environment_systems/air_quality.h"
 #include "environment_systems/buzzer_utils.h"
 #include "scheduling/scheduler.h"
+#include "IOT/IOT_communication.h"
 
 #include <stdio.h>
 #include <stdint.h>
@@ -168,9 +169,12 @@ void update_temperature(){
 
     // Out of range -> active buzzer
     if(comp != 0){
+        send_data(2,0,1);
+        send_data(2,1,0);
         // calling function to activate the buzzer
         turn_on_buzzer();
     } else {
+        send_data(2,0,2);
         //calling function to deactivate buzzer
         turn_off_buzzer(comp, exceeding_threshold());
     }

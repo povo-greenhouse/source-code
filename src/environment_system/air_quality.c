@@ -7,6 +7,7 @@
 #include "environment_systems/temperature.h"
 #include "environment_systems/buzzer_utils.h"
 #include "scheduling/scheduler.h"
+#include "IOT/IOT_communication.h"
 
 #include <stdio.h>
 #include <stdint.h>
@@ -177,9 +178,12 @@ void update_air_hal(uint32_t level){
     bool exceeding = exceeding_threshold();
 
     if(exceeding){ // Turns buzzer on if threshold is exceeded
+        send_data(1,0,1);
+        send_data(1,1,0);
         // Calling function to activate the buzzer
         turn_on_buzzer();
     } else {
+        send_data(1,0,2);
         // Calling function to deactivate buzzer
         turn_off_buzzer(false, exceeding);
     }
