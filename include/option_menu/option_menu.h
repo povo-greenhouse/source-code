@@ -11,7 +11,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "options.h"
-//#include <ti/devices/msp432p4xx/driverlib/driverlib.h>
+#include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <ti/grlib/grlib.h>
 #define MAX_OPTIONS 20
 /*
