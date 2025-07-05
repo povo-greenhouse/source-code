@@ -3,6 +3,7 @@
 #include "environment_systems/buzzer_utils.h"
 #include "scheduling/scheduler.h"
 #include "IOT/IOT_communication.h"
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -13,7 +14,7 @@
 #endif
 
 // Initialization of the temperature sensor to hold temperature sensor data
-static TemperatureSensor ts = {.current_temperature = 21, .higher_threshold = 25, .lower_threshold = 20, .stack_pos=0};
+static TemperatureSensor ts = {.current_temperature = 21, .higher_threshold = 30, .lower_threshold = 20, .stack_pos=0};
 
 void temp_sensor_init() {
 #ifndef SOFTWARE_DEBUG
@@ -31,7 +32,7 @@ void temp_sensor_init() {
 
 #ifdef DEBUG
     // Debug message to indicate that the temperature sensor and buzzer have been initialized
-    printf("Temperature Sensor initialized\n");
+    puts("Temperature Sensor initialized\n");
 #endif
 
     // Creating a task for updating temperature sensor data
@@ -48,7 +49,7 @@ void temp_sensor_init() {
 
 #ifdef DEBUG
     // Debug message to indicate that the temperature sensor task has been added to the scheduler
-    printf("Added temperature sensor to stack\n");
+    puts("Added temperature sensor to stack\n");
 #endif
 
 }
@@ -60,7 +61,7 @@ void temp_set_lower_threshold(uint8_t new_threshold){
 
         #ifdef SOFTWARE_DEBUG
         // Debug message to indicate the lower threshold has been set
-        printf("Lower threshold set to %d\n", ts.lower_threshold);
+        puts("Lower threshold set to %d\n", ts.lower_threshold);
         #endif
     }
 }
@@ -78,7 +79,7 @@ void temp_set_higher_threshold(uint8_t new_threshold){
 
         #ifdef SOFTWARE_DEBUG
         // Debug message to indicate the higher threshold has been set
-        printf("Higher threshold set to %d\n", ts.higher_threshold);
+        puts("Higher threshold set to %d\n", ts.higher_threshold);
         #endif
 
     }
@@ -98,7 +99,7 @@ void temp_set_current_temperature(uint8_t temperature) {
 
     #ifdef SOFTWARE_DEBUG
     // Debug message to indicate the new temperature has been set
-    printf("Current temperature set to %d \n", ts.current_temperature);
+    puts("Current temperature set to %d \n", ts.current_temperature);
     #endif
 
 }
@@ -108,7 +109,7 @@ int8_t would_goldilocks_like_this() {
 
         #ifdef SOFTWARE_DEBUG
         // Debug message to indicate the temperature is too low
-        printf("Temperature is too low\n");
+        puts("Temperature is too low\n");
         #endif
 
         return -1;
@@ -116,14 +117,14 @@ int8_t would_goldilocks_like_this() {
 
         #ifdef SOFTWARE_DEBUG
         // Debug message to indicate the temperature is too high
-        printf("Temperature is too high\n");
+        puts("Temperature is too high\n");
         #endif
 
         return 1;
     }else{
         #ifdef SOFTWARE_DEBUG
             // Debug message to indicate the temperature is within the acceptable range
-            printf("Temperature is just right\n");
+            puts("Temperature is just right\n");
         #endif
 
         return 0;
@@ -145,7 +146,7 @@ void update_temperature(){
     #else
 
     // For software debugging, we simulate the ambient temperature input
-    printf("Enter ambient temperature (0-255): ");
+    puts("Enter ambient temperature (0-255): ");
     int temp_input;
 
     // Read the ambient temperature input from the user
@@ -155,7 +156,7 @@ void update_temperature(){
     if (temp_input >= 0 && temp_input <= 255) {
         ambient_temp = (uint8_t)temp_input;
     } else {
-        printf("Input out of range for uint8_t!\n");
+        puts("Input out of range for uint8_t!\n");
     }
 
     #endif
@@ -168,18 +169,14 @@ void update_temperature(){
 
     // Out of range -> active buzzer
     if(comp != 0){
-
-        // calling function to activate the buzzer
         send_data(2,0,1);
         send_data(2,1,0);
+        // calling function to activate the buzzer
         turn_on_buzzer();
-
     } else {
-
-        //calling function to deactivate buzzer
         send_data(2,0,2);
+        //calling function to deactivate buzzer
         turn_off_buzzer(comp, exceeding_threshold());
-
     }
     return;
 }

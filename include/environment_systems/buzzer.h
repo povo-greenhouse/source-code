@@ -1,21 +1,19 @@
-#ifndef ENVIRONMENT_SYSTEM_BUZZER_UTILS_H_
-#define ENVIRONMENT_SYSTEM_BUZZER_UTILS_H_
+#ifndef ENVIRONMENT_SYSTEM_BUZZER_H_
+#define ENVIRONMENT_SYSTEM_BUZZER_H_
 #include <stdbool.h>
 #include <stdint.h>
 
 /***********************
  * pins for the buzzer *
  ***********************/
-#define BUZZER_PORT GPIO_PORT_P2
-#define BUZZER_PIN  GPIO_PIN7
+#define BUZZER_PORT GPIO_PORT_P8
+#define BUZZER_PIN  GPIO_PIN2
 
 /*************************************
  * defining variables for the timers *
  *************************************/
-#define BUZZER_TIMER TIMER_A2_BASE
+#define BUZZER_TIMER TIMER_A3_BASE
 #define BUZZER_CCR   TIMER_A_CAPTURECOMPARE_REGISTER_2
-
-#define PWM_FREQ 24000 // period of the pwm  (48 MHZ (SMCLK) / 2 kHz (tone))
 
 /// @brief Initializes the buzzer by configuring the GPIO pin and setting up the PWM signal.
 /// This function maps the buzzer pin to the appropriate timer output and initializes the PWM configuration.
