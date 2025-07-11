@@ -1,0 +1,30 @@
+option menu:
+	- PIN 5.1 BUTTON A
+	- PIN 5.2 BUTTON B
+	- PIN 4.1 SELECT
+	- PIN 6.0 HORIZONTAL 
+	- PIN 4.4 VERTICAL
+uart comm:
+	- PIN 1.2
+	- PIN 1.3
+water management:
+	- PIN 5.4 ADC
+	- PIN 5.5 ADC
+	- PIN 4.7 PUMP
+	- PIN 4.6 PUMP
+growing lights:
+	- PIN 1.0 LED
+	- PIN 7.7 CCR
+IOT:
+	- PIN 2.3
+	- PIN 5.1
+	- PIN 3.5
+	- PIN 3.7
+	- PIN 5.7
+	- PIN 3.0
+	- PIN 1.7
+	- PIN 5.0
+	- PIN 5.2
+	- PIN 3.6
+buzzer:
+	- PIN 8.2	

@@ -41,7 +41,7 @@ int32_t option_menu_pop_option() {
 void option_menu_init_option_list() {
     option_list.len = 0;
     current_setting = 0;
-    option_menu_is_enabled = false;
+    option_menu_is_enabled = true;
 }
 
 int option_menu_nav_next_option(){
@@ -83,6 +83,7 @@ void option_change_confirm(){
 
 
 void option_menu_draw_current_option(){
+    #ifdef SCREEN_OPTION_MENU_WORKS
     Graphics_clearDisplay(gc);
 
     if(current_setting == -1) {
@@ -115,7 +116,26 @@ void option_menu_draw_current_option(){
     Graphics_drawStringCentered(gc,">",1,96,64, OPAQUE_TEXT);
 
     //printf("%s\n",buf);
+    #else
+    if(current_setting == -1) {
+            UART_write("no option selected", 18, NULL );
+           // printf("no option selected");
 
+            return;
+    }
+    Option curr = option_list.arr[current_setting];
+        //Graphics_fillRectangle(gc,&fill_rect);
+
+       // printf("%s\n",curr.name);
+
+    char val_buf[20];
+    curr.to_string(val_buf,option_get_value(&curr),20);
+    char buf[80];
+    snprintf(buf,80, "%s < %s >",curr.name,val_buf );
+
+    UART_write(buf,80,NULL);
+
+    #endif
 }
 
 void option_menu_toggle(){
@@ -172,8 +192,8 @@ void option_menu_init(Graphics_Context * graphics_context){
     gc = graphics_context;
     option_menu_init_option_list();
     init_option_menu_input();
-    STask handle_input_task = {option_menu_handle_input,10,10,false};
-    STask draw_current= {option_menu_draw_current_option,1000,1000,false};
+    STask handle_input_task = {option_menu_handle_input,10,10,true};
+    STask draw_current= {option_menu_draw_current_option,500,500,true};
     option_menu_tasks.handle_input = push_task(handle_input_task);
     option_menu_tasks.display_on_screen = push_task(draw_current);
 

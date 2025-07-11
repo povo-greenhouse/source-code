@@ -5,7 +5,7 @@
 
 #include "environment_systems/air_quality.h"
 #include "environment_systems/temperature.h"
-#include "environment_systems/buzzer_utils.h"
+//#include "environment_systems/buzzer_utils.h"
 #include "scheduling/scheduler.h"
 #include "IOT/IOT_communication.h"
 
@@ -189,6 +189,7 @@ void update_air_hal(uint32_t level){
     }
     return;
 }
+#endif
 
 float calibrateR0(int32_t no_samples) {
     float sumRs = 0.0f;      // Sum of all valid resistance readings

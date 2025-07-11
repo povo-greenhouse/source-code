@@ -2,7 +2,7 @@
 #include "environment_systems/temperature.h"
 #include "light_system/growing_light.h"
 #include "environment_systems/air_quality.h"
-#include "environment_systems/buzzer_utils.h"
+//#include "environment_systems/buzzer_utils.h"
 #include "scheduling/scheduler.h"
 #include "scheduling/timer.h"
 #include "../test/scheduling_test.h"
@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <ti/grlib/grlib.h>
-
+#include "uart_communication/uart_comm.h"
 #include "../lib/HAL_I2C.h"
 #include "../include/LcdDriver/Crystalfontz128x128_ST7735.h"
 
@@ -185,7 +185,7 @@ void _hwInit(){
 
     water_init();
     init_GPIOs_IOT();
-
+    uart_init();
     // enabling interrupts
     Interrupt_enableInterrupt(INT_TA1_N);
     Interrupt_enableMaster();
@@ -199,12 +199,12 @@ void main(void){
 
 
     while(1){
-        update_light();
-        volatile int32_t i = 0;
-        for(;i<10000;i++);
+      ;;;;;;
       if(scheduler_state == AWAKE){
            scheduler();
        }
        __WFI();
+
+
     }
 }

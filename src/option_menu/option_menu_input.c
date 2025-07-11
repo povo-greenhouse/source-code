@@ -71,8 +71,9 @@ void clear_input_queue(){
     for(a = input_buffer_dequeue(); a != NONE; a= input_buffer_dequeue());
 }
 
-#ifdef ADC_OPTION_MENU_WORKS
-void adc_init(){
+
+void option_menu_adc_init(){
+    #ifdef ADC_OPTION_MENU_WORKS
     /* Configures Pin 6.0 and 4.4 as ADC input(vertical and horizontal joystick) */
     GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P6,GPIO_PIN0,GPIO_TERTIARY_MODULE_FUNCTION);
     GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P4,GPIO_PIN4,GPIO_TERTIARY_MODULE_FUNCTION);
@@ -100,10 +101,12 @@ void adc_init(){
 
     ADC14_enableConversion();
     ADC14_toggleConversionTrigger();
+    #endif
 }
 
-#endif
+
 void buttons_init(){
+    #ifdef ADC_OPTION_MENU_WORKS
     //BUTTON A INPUT: PIN 5.1
 
     //BUTTON B INPUT: PIN 5.2
@@ -140,8 +143,8 @@ void buttons_init(){
     NVIC->ISER[1] ^=1<<((PORT5_IRQn) &31);
     */
     Interrupt_enableInterrupt(INT_PORT4);
+#endif
 }
-
 ControllerInputOption get_joystick_direction(uint16_t horizontal,uint16_t vertical){
     if(horizontal>= JOYSTICK_THRESHOLD_RIGHT){
         return RIGHT;
@@ -217,9 +220,32 @@ void ADC14_IRQHandler(void){
 
 }
 #endif
+ControllerInputOption option_input_from_str(char * buf, uint16_t len){
+    if(strncmp(buf,"UP",len)==0){
+            return UP;
+        }
+        if(strncmp(buf,"DOWN",len)==0){
+                return DOWN;
+            }
+        if(strncmp(buf,"LEFT",len)==0){
+                return LEFT;
+            }
+        if(strncmp(buf,"RIGHT",len)==0){
+                return RIGHT;
+            }
+        if(strncmp(buf,"BUTTON_A",len)==0){
+                return BUTTON_A;
+            }
+        if(strncmp(buf,"BUTTON_B",len)==0){
+                return BUTTON_B;
+            }
+        return NONE;
+}
+
+
 void init_option_menu_input(){
     init_input_queue();
     buttons_init();
-    adc_init();
+    option_menu_adc_init();
 
 }

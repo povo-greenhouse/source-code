@@ -16,7 +16,7 @@ void water_init(){
     state_r =4;
 
     pump_init();
-    adc_init();
+    option_menu_adc_init();
 
       STask task1 = {
           activatePump1,
