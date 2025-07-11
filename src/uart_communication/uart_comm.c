@@ -7,7 +7,7 @@
 #include<stdbool.h>
 
 
-
+#define SEP '\n'
 void uart_init(){
     //setting up uart context
     uart_ctx.tx_buff.write_index = 0;
@@ -31,7 +31,7 @@ void uart_init(){
          8,
          85,
          EUSCI_A_UART_NO_PARITY,
-         EUSCI_A_UART_MSB_FIRST,
+         EUSCI_A_UART_LSB_FIRST,
          EUSCI_A_UART_ONE_STOP_BIT,
          EUSCI_A_UART_MODE,
          EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION,
@@ -125,7 +125,7 @@ void EUSCIA0_IRQHandler(void) {
         uint8_t rx_data = MAP_UART_receiveData(EUSCI_A0_BASE);
 
         if(uart_buff_enqueue(&uart_ctx.rx_buff,rx_data)){
-            if(rx_data ==0){
+            if(rx_data ==SEP){
                 //end of message, handle the input
                 Interrupt_disableMaster();
                 STask t = {
@@ -198,8 +198,10 @@ uint16_t UART_read(uint8_t * buffer, uint16_t max_length){
     uint16_t chars_available = UART_BUF_LEN - buff_available_space(&uart_ctx.rx_buff);
     while(bytes_read < max_length && bytes_read < chars_available ){
         uint8_t next_ch = uart_buff_dequeue(&uart_ctx.rx_buff,NULL);
-        buffer[bytes_read++] = next_ch;
-        if(next_ch == 0){
+        buffer[bytes_read] = next_ch;
+        bytes_read++;
+        if(next_ch == SEP){
+            buffer[bytes_read-1] = '\0';
             break;
         }
 
@@ -237,6 +239,7 @@ void handle_msg(){
 
     parse_msg(uart_ctx.read_buf,READ_BUF_LEN);
 
+
 }
 
 void handle_controller_msg(const char * buff,uint16_t len ){
@@ -254,7 +257,7 @@ void handle_controller_msg(const char * buff,uint16_t len ){
 
 void handle_water_msg(const char * buff, uint16_t len){
     int32_t val = atoi(buff);
-    //TODO
+
 }
 void handle_air_msg(const char * buff, uint16_t len){
     int32_t val = atoi(buff);
