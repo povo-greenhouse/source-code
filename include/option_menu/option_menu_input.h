@@ -7,7 +7,7 @@
 
 #ifndef INCLUDE_OPTION_MENU_OPTION_MENU_INPUT_H_
 #define INCLUDE_OPTION_MENU_OPTION_MENU_INPUT_H_
-
+#include<string.h>
 /*
     the possible inputs for the option menu
  */
@@ -18,10 +18,10 @@ typedef enum {
     LEFT,
     RIGHT,
     BUTTON_A,
-    BUTTON_B
-   // JOYSTICK_SELECT
+    BUTTON_B,
+    JOYSTICK_SELECT
 } ControllerInputOption;
-
+ControllerInputOption option_input_from_str(char * buf, uint16_t len);
 #define INPUT_QUEUE_CAPACITY 50
 /*
     scheduler's task queue, as a circular buffer
