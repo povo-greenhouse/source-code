@@ -1,20 +1,26 @@
 #include "environment_systems/temperature.h"
 #include "environment_systems/air_quality.h"
-//#include "environment_systems/buzzer_utils.h"
-#include "scheduling/scheduler.h"
-#include "IOT/IOT_communication.h"
+#include "environment_systems/buzzer.h"
 
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 
 #ifndef SOFTWARE_DEBUG
+#include "scheduling/scheduler.h"
+#include "IOT/IOT_communication.h"
+
 #include "msp.h"
 #include "../../lib/HAL_I2C.h"
-#endif
 
 // Initialization of the temperature sensor to hold temperature sensor data
 static TemperatureSensor ts = {.current_temperature = 21, .higher_threshold = 30, .lower_threshold = 20, .stack_pos=0};
+
+#else
+
+static TemperatureSensor ts = {.current_temperature = 21, .higher_threshold = 30, .lower_threshold = 20};
+
+#endif
 
 void temp_sensor_init() {
 #ifndef SOFTWARE_DEBUG
@@ -27,8 +33,6 @@ void temp_sensor_init() {
     // Power up the TMP006 sensor and set the conversion rate to 2Hz
     // TMP006_POWER_UP is a bit to power up the sensor, TMP006_CR_2 is the conversion rate
     I2C_write16(TMP006_WRITE_REG, TMP006_POWER_UP | TMP006_CR_2);
-
-#endif
 
 #ifdef DEBUG
     // Debug message to indicate that the temperature sensor and buzzer have been initialized
@@ -51,7 +55,8 @@ void temp_sensor_init() {
     // Debug message to indicate that the temperature sensor task has been added to the scheduler
     puts("Added temperature sensor to stack\n");
 #endif
-
+#endif
+    return;
 }
 
 void temp_set_lower_threshold(uint8_t new_threshold){
@@ -59,9 +64,9 @@ void temp_set_lower_threshold(uint8_t new_threshold){
         // Update the lower threshold
         ts.lower_threshold = new_threshold;
 
-        #ifdef SOFTWARE_DEBUG
+        #ifdef DEBUG
         // Debug message to indicate the lower threshold has been set
-        puts("Lower threshold set to %d\n", ts.lower_threshold);
+        printf("Lower threshold set to %d\n", ts.lower_threshold);
         #endif
     }
 }
@@ -77,9 +82,9 @@ void temp_set_higher_threshold(uint8_t new_threshold){
         // Update the higher threshold
         ts.higher_threshold = new_threshold;
 
-        #ifdef SOFTWARE_DEBUG
+        #ifdef DEBUG
         // Debug message to indicate the higher threshold has been set
-        puts("Higher threshold set to %d\n", ts.higher_threshold);
+        printf("Higher threshold set to %d\n", ts.higher_threshold);
         #endif
 
     }
@@ -97,9 +102,9 @@ void temp_set_current_temperature(uint8_t temperature) {
 
     ts.current_temperature = temperature;
 
-    #ifdef SOFTWARE_DEBUG
+    #ifdef DEBUG
     // Debug message to indicate the new temperature has been set
-    puts("Current temperature set to %d \n", ts.current_temperature);
+    printf("Current temperature set to %d \n", ts.current_temperature);
     #endif
 
 }
@@ -107,7 +112,7 @@ void temp_set_current_temperature(uint8_t temperature) {
 int8_t would_goldilocks_like_this() {
     if(ts.current_temperature < ts.lower_threshold){
 
-        #ifdef SOFTWARE_DEBUG
+        #ifdef DEBUG
         // Debug message to indicate the temperature is too low
         puts("Temperature is too low\n");
         #endif
@@ -115,14 +120,14 @@ int8_t would_goldilocks_like_this() {
         return -1;
     }else if(ts.current_temperature > ts.higher_threshold){
 
-        #ifdef SOFTWARE_DEBUG
+        #ifdef DEBUG
         // Debug message to indicate the temperature is too high
         puts("Temperature is too high\n");
         #endif
 
         return 1;
     }else{
-        #ifdef SOFTWARE_DEBUG
+        #ifdef DEBUG
             // Debug message to indicate the temperature is within the acceptable range
             puts("Temperature is just right\n");
         #endif
@@ -169,20 +174,26 @@ void update_temperature(){
 
     // Out of range -> active buzzer
     if(comp != 0){
+#ifndef SOFTWARE_DEBUG
         send_data(2,0,1);
         send_data(2,1,0);
+#endif
         // calling function to activate the buzzer
         turn_on_buzzer();
     } else {
+#ifndef SOFTWARE_DEBUG
         send_data(2,0,2);
+#endif
         //calling function to deactivate buzzer
         turn_off_buzzer(comp, exceeding_threshold());
     }
     return;
 }
 
+#ifndef SOFTWARE_DEBUG
 void update_temperature_timer(int32_t new_timer){
     // setting the new timer value as specified by user
     task_list.task_array[ts.stack_pos].max_time = new_timer;
     return;
 }
+#endif

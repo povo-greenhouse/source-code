@@ -6,7 +6,7 @@
 void temp_test_initialization(){
 
     assert(temp_get_lower_threshold() == 20);
-    assert(temp_get_higher_threshold() == 40);
+    assert(temp_get_higher_threshold() == 30);
     assert(temp_get_current_temperature() == 21);
 
 }

@@ -2,9 +2,10 @@
 #define INCLUDE_ENVIRONMENT_SYSTEMS_TEMPERATURE_H_
 
 #include <stdint.h>
-#include "scheduling/scheduler.h"
 
 #ifndef SOFTWARE_DEBUG
+
+#include "scheduling/scheduler.h"
 
 /*******************************************
  *  defining the TMP006 register addresses *
@@ -44,7 +45,11 @@ typedef struct TemperatureSensor{
     int8_t current_temperature;
     int8_t higher_threshold;
     int8_t lower_threshold;
+
+#ifndef SOFTWARE_DEBUG
     task_list_index stack_pos;
+#endif
+
 }TemperatureSensor;
 
 /// @brief Initializes the temperature sensor and buzzer, sets up the I2C communication, 
@@ -95,7 +100,10 @@ int8_t would_goldilocks_like_this();
 /// The buzzer is activated if the temperature is out of range, to indicate that the temperature is not suitable for the plants.
 void update_temperature();
 
+#ifndef SOFTWARE_DEBUG
 /// @brief Function to update the timer associated with the update temperature sensor value task.
 /// It sets the new timer value in the scheduler.
 void update_temperature_timer(int32_t);
-#endif
+#endif //end of if guard
+
+#endif // end of file guard

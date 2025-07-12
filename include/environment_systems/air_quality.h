@@ -3,7 +3,9 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#ifndef SOFTWARE_DEBUG
 #include "scheduling/scheduler.h"
+#endif
 
 #define VREF 3.3f // reference voltage (3.3V)
 #define VCC 5.0f // operational power of the MQ135 sensor (taken from the datasheet)
@@ -23,7 +25,9 @@
 typedef struct Air{
     uint32_t threshold;
     uint32_t current_level;
+#ifndef SOFTWARE_DEBUG
     task_list_index stack_pos;
+#endif
 }Air;
 
 /// @brief Initialize the air quality monitoring system
@@ -89,12 +93,14 @@ void update_air();
 /// @param level The raw sensor value representing the air quality level
 void update_air_hal(uint32_t);
 #endif
+
+#ifndef SOFTWARE_DEBUG
 /// @brief Update the air quality monitoring timer interval
 /// It sets the new timer value in the scheduler to allow dynamic adjustment 
 /// of how frequently the air quality sensor is read.
 /// @param new_timer The new timer interval in milliseconds
 void update_air_timer(int32_t);
-
+#endif
 /// @brief Calibrate the baseline resistance of the MQ135 sensor. 
 /// It determines the sensor's resistance in clean air (R0).
 /// This value is crucial for accurate gas concentration calculations.

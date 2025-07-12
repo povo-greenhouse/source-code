@@ -1,22 +1,27 @@
-// updated 24/06 - succesfully added pwm to system. Done with the code, might need to change the tick period
-
 #include "light_system/growing_light.h"
-#include "scheduling/scheduler.h"
-#include "IOT/IOT_communication.h"
 
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 
 #ifndef SOFTWARE_DEBUG
+#include "scheduling/scheduler.h"
+#include "IOT/IOT_communication.h"
+
 #include "msp.h"
 #include "ti/devices/msp432p4xx/driverlib/driverlib.h"
 #include "../../lib/HAL_I2C.h"
-#endif
 
 // Initializing the grow light structure to hold the current state of the grow light system
 GrowLight gl= {.current_brightness = 0, .threshold = MIN_BRIGHTNESS, .manual_mode = false, .on = false, .stack_pos=0};
+#else
 
+GrowLight gl= {.current_brightness = 0, .threshold = MIN_BRIGHTNESS, .manual_mode = false, .on = false};
+
+#endif
+
+
+#ifndef SOFTWARE_DEBUG
 // Timer_A Up Configuration Parameter
 const Timer_A_UpModeConfig upConfig_led = {
             TIMER_A_CLOCKSOURCE_SMCLK,              // SMCLK = 3 MHz
@@ -33,7 +38,10 @@ Timer_A_CompareModeConfig compareConfig_led = {
                 TIMER_A_OUTPUTMODE_RESET_SET,               // Reset
                 0                                           // 0% Duty Cycle initially
 };
+#endif
+
 void grow_light_init(){
+#ifndef SOFTWARE_DEBUG
     // Setting up the I2C communication for the OPT3001 light sensor
     I2C_setslave(OPT3001_SLAVE_ADDRESS);
     // Reseting the OPT3001 sensor
@@ -53,11 +61,6 @@ void grow_light_init(){
     // Turning off the lights
     GPIO_setOutputLowOnPin(LED_PORT, LED_PIN);
 
-#ifdef DEBUG
-    // Debug message to indicate that the grow light has been initialized
-    puts("GrowLight initialized\n");
-#endif
-
     // Creating a task for updating the grow light system
         // The task will call the update_light function every 500 ms
         STask light =  {
@@ -72,6 +75,12 @@ void grow_light_init(){
 #ifdef DEBUG
     // Debug message to indicate that the grow light has been initialized
     puts("Added task to scheduler");
+#endif
+#endif
+
+#ifdef DEBUG
+    // Debug message to indicate that the grow light has been initialized
+    puts("GrowLight initialized\n");
 #endif
     return;
 }
@@ -112,50 +121,73 @@ void grow_light_set_brightness(uint32_t brightness){
 
 #ifdef DEBUG
     // Debug message to indicate the brightness has changed
-    printf("PWM Brightness set to %lu\n", brightness);
+    printf("PWM Brightness set to %u\n", brightness);
 #endif
 
+#ifndef SOFTWARE_DEBUG
     if (brightness >= 2000 && brightness <= 2500) {
         send_data(5,0,2);
     } else if (brightness >= 500 && brightness < 2000) {
         send_data(5,0,3);
-    } else if (brightness >= 0 && brightness < 500) {
+    } else {
         send_data(5,0,4);
     }
     send_data(5,1,0);
-
+#endif
     return;
 }
 
 void grow_light_set_threshold(uint32_t new_threshold){
 
     if(gl.manual_mode){ // sets the threashold only if the grow light is in manual mode
+        if(new_threshold < MIN_BRIGHTNESS){
+            printf("New threshold is too low %d\n", new_threshold);
+            // if the new threshold is less than the minimum brightness, set it to the minimum brightness
+            new_threshold = MIN_BRIGHTNESS;
+        } else if(new_threshold > MAX_BRIGHTNESS){
+            printf("New threshold is too high %d\n", new_threshold);
+            // if the new threshold is greater than the maximum brightness, set it to the maximum brightness
+            new_threshold = MAX_BRIGHTNESS;
+        }
+
         gl.threshold = new_threshold;
 
-#ifdef DEBUG
-        // Debug message to indicate the threshold has been set
-        printf("Threshold set to %d\n", new_threshold);
-#endif
-
     }
+
+#ifdef DEBUG
+    // Debug message to indicate the threshold has been set
+    printf("Threshold set to %d\n", gl.threshold);
+#endif
 }
 
 void grow_light_set_mode(int32_t manual_mode) {
 
     if(manual_mode == 0){ // turning off manual node
-
+#ifdef DEBUG
+        // Debug message to indicate the manual mode is being turned off
+        puts("Turning off manual mode");
+#endif
         // setting manual mode to false
         gl.manual_mode = false;
+#ifndef SOFTWARE_DEBUG
+        // Starting timer
         Timer_A_startCounter(TIMER_A1_BASE, TIMER_A_UP_MODE);
-
+#endif
     } else { // turning on manual mode
+
+#ifdef DEBUG
+        // Debug message to indicate the manual mode is being turned on
+        puts("Turning on manual mode");
+#endif
 
         // setting manual mode to true
         gl.manual_mode = true;
+#ifndef SOFTWARE_DEBUG
         // stopping timer
         Timer_A_stopTimer(TIMER_A1_BASE);
-        Timer_A_clearInterruptFlag(TIMER_A1_BASE); // Optional
-
+        // Clearing the interrupt flag
+        Timer_A_clearInterruptFlag(TIMER_A1_BASE);
+#endif
     }
     return;
 }
@@ -166,10 +198,14 @@ void power_on_or_off(int32_t on){
 
     if(on == 0){ // to turn on
         gl.on = false;
+#ifndef SOFTWARE_DEBUG
         GPIO_setOutputLowOnPin(LED_PORT, LED_PIN); // turn off leds manually
+#endif
     }else{
         gl.on = true;
+#ifndef SOFTWARE_DEBUG
         GPIO_setOutputHighOnPin(LED_PORT, LED_PIN); // turn on leds manually
+#endif
     }
 
     #ifdef DEBUG
@@ -214,7 +250,7 @@ void update_light(){
 
 #ifdef DEBUG
         // Debug message to indicate the sensor value that has been read and calculated
-        puts("Sensor value: %d\n", sensor_val);
+        printf("Sensor value: %d\n", sensor_val);
 #endif
         uint32_t calculated_brightness;
         // If the sensor value is below the threshold, turn on the grow light and update the light intensity
@@ -261,7 +297,7 @@ void update_light_hal(uint32_t raw){
             case 11: sensor_val = sensor_val << 5; break; // * 32
         }
 
-        puts("Sensor value: %d\n", sensor_val);
+        printf("Sensor value: %d\n", sensor_val);
 
         uint32_t calculated_brightness;
                 // If the sensor value is below the threshold, turn on the grow light and update the light intensity
@@ -282,6 +318,7 @@ void update_light_hal(uint32_t raw){
 }
 #endif
 
+#ifndef SOFTWARE_DEBUG
 void TA1_N_IRQHandler(void){
     // Timer_A1 resigter 1 interrupt handler
     if (Timer_A_getCaptureCompareInterruptStatus(TIMER_A1_BASE,
@@ -298,3 +335,4 @@ void update_light_timer(int32_t new_timer){
     task_list.task_array[gl.stack_pos].max_time = new_timer;
     return;
 }
+#endif
