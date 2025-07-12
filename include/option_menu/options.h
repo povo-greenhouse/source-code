@@ -170,7 +170,7 @@ typedef void (*FmtStringFP)(char *,int32_t,size_t);
 */
 typedef void (*OnChangeFP)(int32_t);
 
-#define OPTION_NAME_MAX_LENGTH 20
+#define OPTION_NAME_MAX_LENGTH 50
 
 /*
     struct representing an option in the menu

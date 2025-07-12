@@ -7,7 +7,7 @@
 #include<stdbool.h>
 
 
-
+#define SEP '\n'
 void uart_init(){
     //setting up uart context
     uart_ctx.tx_buff.write_index = 0;
@@ -31,7 +31,7 @@ void uart_init(){
          8,
          85,
          EUSCI_A_UART_NO_PARITY,
-         EUSCI_A_UART_MSB_FIRST,
+         EUSCI_A_UART_LSB_FIRST,
          EUSCI_A_UART_ONE_STOP_BIT,
          EUSCI_A_UART_MODE,
          EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION,
@@ -54,35 +54,36 @@ void uart_init(){
 
 
 
-bool uart_buff_is_full(UART_Buffer * buff){
+bool uart_buff_is_full(volatile UART_Buffer * buff){
     if ((buff->write_index + 1) % UART_BUF_LEN ==
             buff->read_index) {
             return 1;
         }
     return 0;
 }
-bool uart_buff_is_empty(UART_Buffer * buff){
+bool uart_buff_is_empty(volatile UART_Buffer * buff){
     if(buff->write_index == buff->read_index){
         return 1;
     }
     return 0;
 }
-int uart_buff_enqueue(UART_Buffer * buff, uint8_t ch) {
+int uart_buff_enqueue(volatile UART_Buffer * buff, uint8_t ch) {
 
     if(uart_buff_is_full(buff)){return 0;}
     buff->arr[buff->write_index] = ch;
     buff->write_index = (buff->write_index + 1) % UART_BUF_LEN;
     return 1;
 }
-inline uint16_t buff_available_space(UART_Buffer * buff){
+inline uint16_t buff_available_space(volatile UART_Buffer * buff){
     if(buff->write_index >= buff->read_index){
         return UART_BUF_LEN - (buff->write_index - buff->read_index);
+        return UART_BUF_LEN + buff->read_index - buff->write_index -1;
 
     }
-    return buff->read_index - buff->write_index;
+    return buff->read_index - buff->write_index -1;
 }
 // dequeues the last char
-uint8_t uart_buff_dequeue(UART_Buffer * buff, int * error) {
+uint8_t uart_buff_dequeue(volatile UART_Buffer * buff, int * error) {
     if(uart_buff_is_empty(buff)){
         *error = 1;
         return 0;
@@ -93,9 +94,18 @@ uint8_t uart_buff_dequeue(UART_Buffer * buff, int * error) {
 }
 
 
+void rx_handle_overflow(){
+    int error = 0;
+    while(error != 1){
+        uart_buff_dequeue(&uart_ctx.rx_buff,&error);
+    }
+    uart_ctx.rx_overflow = false;
+
+}
+
 void EUSCIA0_IRQHandler(void) {
-    uint32_t status = MAP_UART_getEnabledInterruptStatus(EUSCI_A0_BASE);
-    MAP_UART_clearInterruptFlag(EUSCI_A0_BASE, status);
+    uint32_t status = UART_getEnabledInterruptStatus(EUSCI_A0_BASE);
+    UART_clearInterruptFlag(EUSCI_A0_BASE, status);
 
     // tx
 
@@ -106,10 +116,10 @@ void EUSCIA0_IRQHandler(void) {
         UART_Context * uart_ctx_ptr = &uart_ctx;
         if(error == 0){
             UART_transmitData(EUSCI_A0_BASE, next_ch);
-            printf("transmitted %c\n",next_ch);
+           // printf("transmitted %c\n",next_ch);
         }else{
             //buffer empty: disable tx interrupt
-            MAP_UART_disableInterrupt(EUSCI_A0_BASE,EUSCI_A_UART_TRANSMIT_INTERRUPT);
+            UART_disableInterrupt(EUSCI_A0_BASE,EUSCI_A_UART_TRANSMIT_INTERRUPT);
             uart_ctx.tx_busy = false;
 
             //invoke tx completion callback
@@ -122,12 +132,12 @@ void EUSCIA0_IRQHandler(void) {
     // rx
 
     if(status & EUSCI_A_UART_RECEIVE_INTERRUPT_FLAG){
-        uint8_t rx_data = MAP_UART_receiveData(EUSCI_A0_BASE);
+        uint8_t rx_data = UART_receiveData(EUSCI_A0_BASE);
 
         if(uart_buff_enqueue(&uart_ctx.rx_buff,rx_data)){
-            if(rx_data ==0){
+            if(rx_data ==SEP){
                 //end of message, handle the input
-                Interrupt_disableMaster();
+                disable_timer_interrupt();
                 STask t = {
                            handle_msg,
                            0,
@@ -136,7 +146,7 @@ void EUSCIA0_IRQHandler(void) {
                 };
                 enqueue_task(&t);
                 scheduler_state = AWAKE;
-                Interrupt_enableMaster();
+                enable_timer_interrupt();
             }
             if(uart_ctx.rx_data_callback){
                 uart_ctx.rx_data_callback(rx_data);
@@ -145,6 +155,8 @@ void EUSCIA0_IRQHandler(void) {
         }else {
             //overflow
             uart_ctx.rx_overflow = true;
+            //handle overflow
+            rx_handle_overflow();
         }
     }
 }
@@ -153,10 +165,7 @@ void tx_complete_callback(void){
 
 }
 void rx_data_callback(uint8_t ch){
-    //message completed, allow read
-    if(ch == 0){
 
-    }
 }
 
 bool UART_write(const uint8_t *data, uint16_t length, void (*callback)(void)){
@@ -198,8 +207,10 @@ uint16_t UART_read(uint8_t * buffer, uint16_t max_length){
     uint16_t chars_available = UART_BUF_LEN - buff_available_space(&uart_ctx.rx_buff);
     while(bytes_read < max_length && bytes_read < chars_available ){
         uint8_t next_ch = uart_buff_dequeue(&uart_ctx.rx_buff,NULL);
-        buffer[bytes_read++] = next_ch;
-        if(next_ch == 0){
+        buffer[bytes_read] = next_ch;
+        bytes_read++;
+        if(next_ch == SEP){
+            buffer[bytes_read-1] = '\0';
             break;
         }
 
@@ -221,21 +232,22 @@ void RMT_to_string(uint8_t * buffer, RxMessageType type){
 }
 
 RxMessageType RMT_from_string(const uint8_t * str,uint16_t len){
-    if(strncmp(str,"CONTROLLER",len)){
+    if(strncmp(str,"CONTROLLER",10)== 0){
         return CONTROLLER;
     }
-    if(strncmp(str,"WATER",len)){
+    if(strncmp(str,"WATER",5)== 0){
             return WATER;
         }
-    if(strncmp(str,"AIR",len)){
+    if(strncmp(str,"AIR",3)==0){
             return AIR;
         }
 }
 
 void handle_msg(){
-    UART_read(uart_ctx.read_buf,READ_BUF_LEN);
+    uint16_t len = UART_read(uart_ctx.read_buf,READ_BUF_LEN);
 
-    parse_msg(uart_ctx.read_buf,READ_BUF_LEN);
+    parse_msg(uart_ctx.read_buf,len);
+
 
 }
 
@@ -254,7 +266,7 @@ void handle_controller_msg(const char * buff,uint16_t len ){
 
 void handle_water_msg(const char * buff, uint16_t len){
     int32_t val = atoi(buff);
-    //TODO
+
 }
 void handle_air_msg(const char * buff, uint16_t len){
     int32_t val = atoi(buff);
@@ -262,10 +274,10 @@ void handle_air_msg(const char * buff, uint16_t len){
 }
 void parse_msg(const uint8_t * buffer,uint16_t len){
 
-
+    printf("%s\n",buffer);
     //find the :
     char *  colon_pos = strchr(buffer, ':');
-    if(colon_pos < buffer && colon_pos > buffer + len){
+    if(colon_pos < buffer && colon_pos >= buffer + len){
         return;
     }
     uint16_t index = colon_pos - buffer;

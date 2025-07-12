@@ -199,7 +199,7 @@ void main(void){
 
 
     while(1){
-      ;;;;;;
+
       if(scheduler_state == AWAKE){
            scheduler();
        }
