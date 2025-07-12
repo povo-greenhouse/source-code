@@ -2,6 +2,7 @@
 #include "air_qual_test.h"
 #include "temp_test.h"
 #include "buzzer_test.h"
+/*
 int main(){
    // no harware inits should be found here
    light_test_main();
@@ -12,3 +13,4 @@ int main(){
 //        option_menu_test_main();
    return 0;
 }
+*/

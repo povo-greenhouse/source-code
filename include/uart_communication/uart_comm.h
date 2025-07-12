@@ -22,7 +22,7 @@ void RMT_to_string(uint8_t * buffer, RxMessageType type);
 
 RxMessageType RMT_from_string(const uint8_t * str,uint16_t len);
 
-void parse_message(const uint8_t * buffer,uint16_t len);
+void parse_msg(const uint8_t * buffer,uint16_t len);
 
 typedef struct {
     uint8_t arr[UART_BUF_LEN];
