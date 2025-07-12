@@ -3,27 +3,39 @@
  * The MQ135 can detect various gases including CO2, NH3, NOx, alcohol, benzene, smoke, etc.
  */
 
-#include "environment_systems/air_quality.h"
-#include "environment_systems/temperature.h"
-//#include "environment_systems/buzzer_utils.h"
-#include "scheduling/scheduler.h"
-#include "IOT/IOT_communication.h"
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "environment_systems/air_quality.h"
+#include "environment_systems/temperature.h"
+#include "environment_systems/buzzer.h"
+
 #ifndef SOFTWARE_DEBUG
+#include "scheduling/scheduler.h"
+#include "IOT/IOT_communication.h"
+
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #endif
 
+#ifndef SOFTWARE_DEBUG
 // Global air quality data structure
 static Air air = {
     .threshold = 450, // Default air quality threshold (ppm)
     .current_level = 0,
     .stack_pos = 0
 };
+
+#else
+
+// Global air quality for testing purposes
+static Air air = {
+    .threshold = 450,
+    .current_level = 0
+};
+
+#endif
 
 void air_init(){
 
@@ -53,13 +65,6 @@ void air_init(){
     // Enable the ADC for conversions
     ADC14_enableConversion();
 
-#endif
-
-#ifdef DEBUG
-    // Debug message to confirm initialization
-    puts("Air initialized\n");
-#endif
-
     // Create a scheduled task for periodic air quality updates
     // This task will run the update_air() function every 2000ms (2 seconds)
     STask air_qual = { update_air,  // Function pointer to the update function
@@ -76,6 +81,13 @@ void air_init(){
     puts("Added air quality task to stack\n");
 #endif
 
+#endif
+
+#ifdef DEBUG
+    // Debug message to confirm initialization
+    puts("Air initialized\n");
+#endif
+
     return;
 }
 
@@ -84,7 +96,7 @@ void air_set_threshold(uint32_t level){
 
 #ifdef DEBUG
     // Debug message to indicate threshold update
-    puts("Air threshold set to %d\n", level);
+    printf("Air threshold set to %d\n", level);
 #endif
 
     return;
@@ -168,6 +180,7 @@ void update_air(){
     }
     return;
 }
+
 #else
 
 void update_air_hal(uint32_t level){
@@ -178,12 +191,16 @@ void update_air_hal(uint32_t level){
     bool exceeding = exceeding_threshold();
 
     if(exceeding){ // Turns buzzer on if threshold is exceeded
+#ifndef SOFTWARE_DEBUG
         send_data(1,0,1);
         send_data(1,1,0);
+#endif
         // Calling function to activate the buzzer
         turn_on_buzzer();
     } else {
+#ifndef SOFTWARE_DEBUG
         send_data(1,0,2);
+#endif
         // Calling function to deactivate buzzer
         turn_off_buzzer(false, exceeding);
     }
@@ -191,6 +208,7 @@ void update_air_hal(uint32_t level){
 }
 #endif
 
+#ifndef SOFTWARE_DEBUG
 float calibrateR0(int32_t no_samples) {
     float sumRs = 0.0f;      // Sum of all valid resistance readings
     int valid_samples = 0;   // Count of valid samples (non-zero voltage)
@@ -225,3 +243,4 @@ void update_air_timer(int32_t new_timer){
     task_list.task_array[air.stack_pos].max_time = new_timer;
     return;
 }
+#endif

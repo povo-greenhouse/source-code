@@ -5,8 +5,6 @@
  *      Author: riginel
  */
 #include "scheduling_test.h"
-#include "scheduling/scheduler.h"
-#include "msp.h"
 void sched_test_configurePorts(){
     /* configure P2.0, P2.1 and P2.2 as GPIO */
     P2->SEL0 &= ~(BIT0| BIT1 | BIT2);

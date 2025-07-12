@@ -45,8 +45,8 @@ void air_test_comparasion_operations(){
 void air_test_initialization(){
     // do not air_init since it onlt inits the GPIO pin (entirely hardware)
     
-    assert(air_get_threshold() == 21);
-    assert(air_get_level() == 40);
+    assert(air_get_threshold() == 450);
+    assert(air_get_level() == 0);
 
 }
 int air_test_main(){
@@ -58,4 +58,3 @@ int air_test_main(){
 
     return 0;
 }
-

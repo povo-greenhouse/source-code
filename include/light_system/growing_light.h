@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+
+#ifndef SOFTWARE_DEBUG
 #include "scheduling/scheduler.h"
 
 #define LED_PORT GPIO_PORT_P1
@@ -29,6 +31,8 @@
 // to configure the sensor to operate for a 100ms conversion time
 #define DEFAULT_CONFIG_100 0xC410 // 100ms
 
+#endif
+
 /******************************************************
  *  defining the threshold values for the grow light *
  ******************************************************/
@@ -54,7 +58,9 @@ typedef struct GrowLight{
     uint32_t threshold;
     bool manual_mode;
     bool on;
+#ifndef SOFTWARE_DEBUG
     task_list_index stack_pos;
+#endif
 }GrowLight;
 
 /// @brief Initializes the grow light system.
@@ -132,6 +138,7 @@ void update_light();
 void update_light_hal(uint32_t);
 #endif
 
+#ifndef SOFTWARE_DEBUG
 /// @brief Updates the light timer with the specified time.
 /// This function sets the timer value for the grow light system, which determines how often the light system is updated.
 void update_light_timer(int32_t);
@@ -139,4 +146,6 @@ void update_light_timer(int32_t);
 /// @brief Timer_A1 interrupt handler for the grow light system.
 /// This function is called when the Timer_A1 interrupt occurs, toggling the LED state.
 void TA1_N_IRQHandler(void);
-#endif
+#endif // end of if guard
+
+#endif // end of file guard

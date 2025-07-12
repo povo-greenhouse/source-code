@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifndef SOFTWARE_DEBUG
 /***********************
  * pins for the buzzer *
  ***********************/
@@ -14,6 +15,7 @@
  *************************************/
 #define BUZZER_TIMER TIMER_A3_BASE
 #define BUZZER_CCR   TIMER_A_CAPTURECOMPARE_REGISTER_2
+#endif
 
 /// @brief Initializes the buzzer by configuring the GPIO pin and setting up the PWM signal.
 /// This function maps the buzzer pin to the appropriate timer output and initializes the PWM configuration.
@@ -30,5 +32,9 @@ void turn_on_buzzer();
 /// @param temp The current temperature range reading to check if the buzzer should be active. If it is 0 (within normal range), the buzzer can be turned off.
 /// @param air A boolean indicating whether the air system is needs the buzzer to be active. If false, the buzzer can be turned off. 
 void turn_off_buzzer(int8_t, bool);
+
+/// @brief Function to check if the buzzer is currently on.
+/// @return Returns true if the buzzer is on, false otherwise.
+bool is_buzzer_on();
 
 #endif

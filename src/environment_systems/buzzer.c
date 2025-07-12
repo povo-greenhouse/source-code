@@ -1,6 +1,7 @@
 #include "environment_systems/buzzer.h"
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #ifndef SOFTWARE_DEBUG
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
@@ -9,11 +10,12 @@
 /// @brief Flag to indicate if the buzzer is currently on. Prevents multiple activations or deactivations of the buzzer.
 static bool is_on = false;
 
+#ifndef SOFTWARE_DEBUG
 // Timer configuration for the buzzer
 Timer_A_UpModeConfig buzzerTimerConfig = {
-    TIMER_A_CLOCKSOURCE_SMCLK,
-    TIMER_A_CLOCKSOURCE_DIVIDER_1,
-    48000 , // For 1 kHz tone (48 MHz / 48000 = 1 kHz)
+    TIMER_A_CLOCKSOURCE_SMCLK, // 3MHz clock source
+    TIMER_A_CLOCKSOURCE_DIVIDER_1, // No division, 3 MHz
+    3000 , // For 1 kHz tone (3 MHz / 3000 = 1 kHz)
     TIMER_A_TAIE_INTERRUPT_DISABLE,
     TIMER_A_CCIE_CCR0_INTERRUPT_DISABLE,
     TIMER_A_DO_CLEAR
@@ -24,8 +26,9 @@ Timer_A_CompareModeConfig buzzerPWMConfig = {
     TIMER_A_CAPTURECOMPARE_REGISTER_2,         // CCR2 for P8.2
     TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE,
     TIMER_A_OUTPUTMODE_TOGGLE_SET,             // Toggle output
-    24000                                       // 50% duty cycle
+    1500                                       // 50% duty cycle
 };
+#endif
 
 void init_buzzer(){
 #ifndef SOFTWARE_DEBUG
@@ -42,6 +45,11 @@ void init_buzzer(){
     // Stop the timer in up mode, to turn off the buzzer initially
     Timer_A_stopTimer(BUZZER_TIMER);
 #endif
+
+#ifdef DEBUG
+    puts("Initalized buzzer\n");
+#endif
+
     return;
 }
 
@@ -80,4 +88,8 @@ void turn_off_buzzer(int8_t temp, bool air){
         puts("Deactivating buzzer\n");
 #endif
     }
+}
+
+bool is_buzzer_on(){
+    return is_on;
 }
