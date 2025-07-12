@@ -221,24 +221,27 @@ void ADC14_IRQHandler(void){
 }
 #endif
 ControllerInputOption option_input_from_str(char * buf, uint16_t len){
-    if(strncmp(buf,"UP",len)==0){
+    if(strncmp(buf,"UP",2)==0){
             return UP;
         }
-        if(strncmp(buf,"DOWN",len)==0){
+        if(strncmp(buf,"DOWN",4)==0){
                 return DOWN;
             }
-        if(strncmp(buf,"LEFT",len)==0){
+        if(strncmp(buf,"LEFT",4)==0){
                 return LEFT;
             }
-        if(strncmp(buf,"RIGHT",len)==0){
+        if(strncmp(buf,"RIGHT",5)==0){
                 return RIGHT;
             }
-        if(strncmp(buf,"BUTTON_A",len)==0){
+        if(strncmp(buf,"BUTTON_A",8)==0){
                 return BUTTON_A;
             }
-        if(strncmp(buf,"BUTTON_B",len)==0){
+        if(strncmp(buf,"BUTTON_B",8)==0){
                 return BUTTON_B;
             }
+        if((strncmp(buf,"JOYSTICK_SELECT",15) ==0) || (strncmp(buf,"SELECT",6)==0) ){
+            return JOYSTICK_SELECT;
+        }
         return NONE;
 }
 
