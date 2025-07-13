@@ -13,9 +13,13 @@
 #include <stdbool.h>
 #define UART_BUF_LEN 256
 #define READ_BUF_LEN 64
+
+uint32_t water_arr[2];
+
 typedef enum __RxMessageType {
     CONTROLLER,
-    WATER,
+    WATER1,
+    WATER2,
     AIR
 }RxMessageType;
 void RMT_to_string(uint8_t * buffer, RxMessageType type);
