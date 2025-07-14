@@ -13,10 +13,10 @@
 #include "../../lib/HAL_I2C.h"
 
 // Initializing the grow light structure to hold the current state of the grow light system
-GrowLight gl= {.current_brightness = 0, .threshold = MIN_BRIGHTNESS, .manual_mode = false, .on = false, .stack_pos=0};
+GrowLight gl= {.current_brightness = 0, .threshold = 1500, .manual_mode = false, .on = false, .stack_pos=0};
 #else
 
-GrowLight gl= {.current_brightness = 0, .threshold = MIN_BRIGHTNESS, .manual_mode = false, .on = false};
+GrowLight gl= {.current_brightness = 0, .threshold = 1500, .manual_mode = false, .on = false};
 
 #endif
 
@@ -25,9 +25,9 @@ GrowLight gl= {.current_brightness = 0, .threshold = MIN_BRIGHTNESS, .manual_mod
 // Timer_A Up Configuration Parameter
 const Timer_A_UpModeConfig upConfig_led = {
             TIMER_A_CLOCKSOURCE_SMCLK,              // SMCLK = 3 MHz
-            TIMER_A_CLOCKSOURCE_DIVIDER_1,          // SMCLK/32 = 1 kHz
-            2500,                                  // 2500 ms tick period
-            TIMER_A_TAIE_INTERRUPT_DISABLE,         // Disable Timer interrupt
+            TIMER_A_CLOCKSOURCE_DIVIDER_1,          // No divider
+            2500,                                   // 2500 ms tick period (3 MHz / 2500 = 1.2 kHz)
+            TIMER_A_TAIE_INTERRUPT_ENABLE,          // Enable Timer interrupt
             TIMER_A_CCIE_CCR0_INTERRUPT_DISABLE,    // Disable CCR0 interrupt
             TIMER_A_DO_CLEAR                        // Clear value
 };
@@ -57,17 +57,17 @@ void grow_light_init(){
     Timer_A_initCompare(TIMER_A1_BASE, &compareConfig_led);
 
     // Start Timer_A1
-    Timer_A_startCounter(TIMER_A1_BASE, TIMER_A_UP_MODE);
+//    Timer_A_startCounter(TIMER_A1_BASE, TIMER_A_UP_MODE);
     // Turning off the lights
     GPIO_setOutputLowOnPin(LED_PORT, LED_PIN);
 
     // Creating a task for updating the grow light system
         // The task will call the update_light function every 500 ms
-        STask light =  {
-            update_light,   // Function to update the grow light
-            500,            // Task interval in milliseconds (to be updated)
-            500,            // Time until task is processed in milliseconds (to be updated)
-            0               // Task status, initially set to 0 (not active)
+        STask light = {
+            update_light,    // Function to update the grow light
+            10000,            // Task interval in milliseconds (10 second)
+            10000,            // Time until task is processed in milliseconds (10 second)
+            true             // Task status, initially set to true (active)
         };
 
         // Adding the task to the scheduler
@@ -125,12 +125,12 @@ void grow_light_set_brightness(uint32_t brightness){
 #endif
 
 #ifndef SOFTWARE_DEBUG
-    if (brightness >= 2000 && brightness <= 2500) {
-        send_data(5,0,2);
-    } else if (brightness >= 500 && brightness < 2000) {
+    if(brightness < MIN_BRIGHTNESS){
+        send_data(5,0,4);
+    } else if (brightness < MAX_BRIGHTNESS){
         send_data(5,0,3);
     } else {
-        send_data(5,0,4);
+        send_data(5,0,2);
     }
     send_data(5,1,0);
 #endif
@@ -158,6 +158,7 @@ void grow_light_set_threshold(uint32_t new_threshold){
     // Debug message to indicate the threshold has been set
     printf("Threshold set to %d\n", gl.threshold);
 #endif
+    return;
 }
 
 void grow_light_set_mode(int32_t manual_mode) {
@@ -259,6 +260,7 @@ void update_light(){
             if(gl.on){
                 gl.on = false;
                 Timer_A_stopTimer(TIMER_A1_BASE);
+//                Timer_A_clearInterruptFlag(TIMER_A1_BASE);
                 GPIO_setOutputLowOnPin(LED_PORT, LED_PIN);
             }
         } else {
@@ -319,16 +321,25 @@ void update_light_hal(uint32_t raw){
 #endif
 
 #ifndef SOFTWARE_DEBUG
-void TA1_N_IRQHandler(void){
-    // Timer_A1 resigter 1 interrupt handler
+
+void TA1_N_IRQHandler(void) {
+    // Check CCR1 interrupt
     if (Timer_A_getCaptureCompareInterruptStatus(TIMER_A1_BASE,
                                                  TIMER_A_CAPTURECOMPARE_REGISTER_1,
-                                                 TIMER_A_CAPTURECOMPARE_INTERRUPT_FLAG)){
+                                                 TIMER_A_CAPTURECOMPARE_INTERRUPT_FLAG)) {
         Timer_A_clearCaptureCompareInterrupt(TIMER_A1_BASE,
                                              TIMER_A_CAPTURECOMPARE_REGISTER_1);
-        GPIO_toggleOutputOnPin(LED_PORT, LED_PIN);
+        GPIO_setOutputLowOnPin(LED_PORT, LED_PIN);
     }
+
+    // Check Timer overflow
+    // Check and clear overflow interrupt (TAIFG)
+        if (TIMER_A1->CTL & TIMER_A_CTL_IFG) {
+            TIMER_A1->CTL &= ~TIMER_A_CTL_IFG;
+            GPIO_setOutputHighOnPin(LED_PORT, LED_PIN);
+        }
 }
+
 
 void update_light_timer(int32_t new_timer){
     // setting the new timer value as specified by user
