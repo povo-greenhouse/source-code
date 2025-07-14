@@ -64,9 +64,6 @@ void add_tasks_to_option_menu(){
     Option leds_switch = option_new("power leds", SWITCH, opt_led_s_power, power_on_or_off, to_string_switch_default);
     option_menu_push_option(leds_switch);
 
-
-
-
     // switch for the user to change between manual and automatic modes
     OptionUnion opt_led_s_mode = option_u_new_switch(false);
     Option leds_manual = option_new("manual<->automatic", SWITCH, opt_led_s_mode, grow_light_set_mode, to_string_manual_auto);
@@ -181,7 +178,7 @@ void _hwInit(){
     CS_initClockSignal(CS_SMCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
 
     // initializing the greenhouse systems
-//    _graphicsInit();
+    _graphicsInit();
     scheduler_init();
     timer_init();
     option_menu_init(&g_sContext);
@@ -194,9 +191,9 @@ void _hwInit(){
     temp_sensor_init();
     air_init();
 
-//    water_init();
-//    init_GPIOs_IOT();
-//    uart_init();
+    water_init();
+    init_GPIOs_IOT();
+    uart_init();
     // enabling interrupts
     Interrupt_enableInterrupt(INT_TA1_N);
     Interrupt_enableMaster();
