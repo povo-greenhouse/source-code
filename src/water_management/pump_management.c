@@ -19,11 +19,11 @@
 
 void pump_init() {
     printf("Executing: pump_init()\n");
-    P4->DIR |= BIT7;
-    P4->OUT &= ~BIT7;
+    P6->DIR |= BIT7;
+    P6->OUT &= ~BIT7;
 
-    P4->DIR |= BIT6;
-    P4->OUT &= ~BIT6;
+    P6->DIR |= BIT6;
+    P6->OUT &= ~BIT6;
 
 
 }
@@ -33,7 +33,7 @@ void activatePump1() {
         printf("Executing: activatePump1()\n");
         send_data(6, 1, 0);
 
-        P4->OUT |= BIT7; // Modificato da P1->OUT |= BIT5
+        P6->OUT |= BIT6; // Modificato da P1->OUT |= BIT5
 
         disable_task_at(activate_pump1_index);
         enable_task_at(deactivate_pump1_index);
@@ -49,7 +49,7 @@ void turnOffPump1() {
         printf("Executing: turnOffPump1()\n");
         send_data(6, 0, 0);
 
-        P4->OUT &= ~BIT7;
+        P6->OUT &= ~BIT6;
 
         disable_task_at(deactivate_pump1_index);
         enable_task_at(activate_pump1_index);
@@ -63,7 +63,7 @@ void activatePump2() {
 
         printf("Executing: activatePump2()\n");
         send_data(7, 1, 0);
-        P4->OUT |= BIT6;
+        P6->OUT |= BIT7;
 
         disable_task_at(activate_pump2_index);
         enable_task_at(deactivate_pump2_index);
@@ -74,7 +74,7 @@ void turnOffPump2() {
     if (!block){
         printf("Executing: turnOffPump2()\n");
         send_data(7, 0, 0);
-        P4->OUT &= ~BIT6;
+        P6->OUT &= ~BIT7;
         disable_task_at(deactivate_pump2_index);
         enable_task_at(activate_pump2_index);
         act_2=false;
