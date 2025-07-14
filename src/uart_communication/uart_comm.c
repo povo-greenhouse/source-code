@@ -7,7 +7,7 @@
 #include<stdbool.h>
 
 
-#define SEP '\n'
+#define SEP '$'
 void uart_init(){
     //setting up uart context
     uart_ctx.tx_buff.write_index = 0;
@@ -98,6 +98,7 @@ uint8_t uart_buff_dequeue(volatile UART_Buffer * buff, int * error) {
 
 
 void rx_handle_overflow(){
+    printf("BUFFER OVERFLOW\n");
     int error = 0;
     while(error != 1){
         uart_buff_dequeue(&uart_ctx.rx_buff,&error);
@@ -135,9 +136,11 @@ void EUSCIA0_IRQHandler(void) {
     // rx
 
     if(status & EUSCI_A_UART_RECEIVE_INTERRUPT_FLAG){
+
         uint8_t rx_data = UART_receiveData(EUSCI_A0_BASE);
 
         if(uart_buff_enqueue(&uart_ctx.rx_buff,rx_data)){
+
             if(rx_data ==SEP){
                 //end of message, handle the input
                 disable_timer_interrupt();
@@ -162,6 +165,7 @@ void EUSCIA0_IRQHandler(void) {
             rx_handle_overflow();
         }
     }
+
 }
 
 void tx_complete_callback(void){
@@ -208,6 +212,7 @@ uint16_t UART_read(uint8_t * buffer, uint16_t max_length){
     uint32_t int_status = Interrupt_disableMaster();
     uint16_t bytes_read = 0;
     uint16_t chars_available = UART_BUF_LEN - buff_available_space(&uart_ctx.rx_buff);
+
     while(bytes_read < max_length && bytes_read < chars_available ){
         uint8_t next_ch = uart_buff_dequeue(&uart_ctx.rx_buff,NULL);
         buffer[bytes_read] = next_ch;
@@ -255,6 +260,7 @@ RxMessageType RMT_from_string(const uint8_t * str,uint16_t len){
 }
 
 void handle_msg(){
+
     uint16_t len = UART_read(uart_ctx.read_buf,READ_BUF_LEN);
 
     parse_msg(uart_ctx.read_buf,len);
