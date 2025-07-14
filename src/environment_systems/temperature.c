@@ -43,9 +43,9 @@ void temp_sensor_init() {
     // The task will call the update_temperature function every 1500 ms
     STask temp =  {
         update_temperature,  // Function to update temperature
-        5000,                // Task interval in milliseconds (to be updated)
-        5000,                // Time to process task in milliseconds (to be updated)
-        0                    // Task status, initially set to 0 (not active)
+        5000,                // Task interval in milliseconds (20 seconds)
+        5000,                // Time to process task in milliseconds (20 seconds)
+        false                // Task status, initially set to true (active)
     };
 
     // Adding the temperature update task to the scheduler to ensure it runs periodically

@@ -15,14 +15,16 @@
 #ifndef SOFTWARE_DEBUG
 #include "scheduling/scheduler.h"
 #include "IOT/IOT_communication.h"
+//#include "sensing/sensing.h"
 
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #endif
 
 #ifndef SOFTWARE_DEBUG
+
 // Global air quality data structure
 static Air air = {
-    .threshold = 450, // Default air quality threshold (ppm)
+    .threshold = 8500, // Default air quality threshold (ppm)
     .current_level = 0,
     .stack_pos = 0
 };
@@ -31,7 +33,7 @@ static Air air = {
 
 // Global air quality for testing purposes
 static Air air = {
-    .threshold = 450,
+    .threshold = 8500,
     .current_level = 0
 };
 
@@ -40,6 +42,7 @@ static Air air = {
 void air_init(){
 
 #ifndef SOFTWARE_DEBUG
+
     // Configure GPIO pin P4.3 as analog input for the MQ135 sensor to read the analog voltage output
 //    GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P4,
 //                                                   GPIO_PIN3,
@@ -65,23 +68,26 @@ void air_init(){
 //    // Enable the ADC for conversions
 //    ADC14_enableConversion();
 
+
     // Create a scheduled task for periodic air quality updates
-    // This task will run the update_air() function every 2000ms (2 seconds)
-    STask air_qual = { update_air,  // Function pointer to the update function
-                       2000,        // Task interval in milliseconds
-                       2000,        // Maximum time allowed for task execution
-                       0            // Initial task status (inactive)
-                     };
+    // This task will run the update_air() function every 10 seconds
+    STask air_qual = {
+                      update_air,   // Function pointer to the update function
+                      20000,        // Task interval in milliseconds (10 seconds)
+                      20000,        // Maximum time allowed for task execution
+                      true          // Initial task status (active)
+    };
     
     // Add the task to the scheduler and store its position for future reference
     air.stack_pos = push_task(air_qual);
+#endif
 
 #ifdef DEBUG
     // Debug confirmation that task was added successfully
     puts("Added air quality task to stack\n");
 #endif
 
-#endif
+
 
 #ifdef DEBUG
     // Debug message to confirm initialization
@@ -145,6 +151,7 @@ bool exceeding_threshold(){
 void update_air(){
 #ifndef SOFTWARE_DEBUG
     // Trigger a new ADC conversion
+
 //    ADC14_toggleConversionTrigger();
 //    // Wait for the ADC conversion to complete
 //    while (ADC14_isBusy());
@@ -166,6 +173,7 @@ void update_air(){
 //    uint32_t level = (uint32_t) powf(10.0f, logppm);
 #endif
 
+
     // Check if the new reading exceeds the safety threshold
     bool exceeding = exceeding_threshold();
 
@@ -180,11 +188,13 @@ void update_air(){
 }
 
 #ifndef SOFTWARE_DEBUG
+#ifdef DEBUG
 float calibrateR0(int32_t no_samples) {
     float sumRs = 0.0f;      // Sum of all valid resistance readings
     int valid_samples = 0;   // Count of valid samples (non-zero voltage)
     int i = 0;
     
+
     // Take multiple samples for averaging
     for (; i < no_samples; i++) {
         // Trigger ADC conversion and wait for completion
@@ -208,7 +218,7 @@ float calibrateR0(int32_t no_samples) {
     // Return the average resistance value
     return (sumRs / (float)valid_samples);
 }
-
+#endif
 void update_air_timer(int32_t new_timer){
     // setting the new timer value as specified by user
     task_list.task_array[air.stack_pos].max_time = new_timer;

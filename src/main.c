@@ -7,10 +7,12 @@
 #include "scheduling/timer.h"
 #include "../test/scheduling_test.h"
 #include "option_menu/option_menu.h"
+#include "uart_communication/uart_comm.h"
+
 #include <stdio.h>
+
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <ti/grlib/grlib.h>
-#include "uart_communication/uart_comm.h"
 #include "../lib/HAL_I2C.h"
 #include "../include/LcdDriver/Crystalfontz128x128_ST7735.h"
 #include "water_management/water_init.h"
@@ -55,33 +57,29 @@ void add_tasks_to_option_menu(){
                     //    OptionUnion value,
                     //    OnChangeFP action,
                     //    FmtStringFP to_string)
-
     /*
      * options for light system
      */
 
-    // power to grow lights
+    // Power to grow lights
     OptionUnion opt_led_s_power = option_u_new_switch(false);
     Option leds_switch = option_new("power leds", SWITCH, opt_led_s_power, power_on_or_off, to_string_switch_default);
     option_menu_push_option(leds_switch);
-
-
-
 
     // switch for the user to change between manual and automatic modes
     OptionUnion opt_led_s_mode = option_u_new_switch(false);
     Option leds_manual = option_new("manual<->automatic", SWITCH, opt_led_s_mode, grow_light_set_mode, to_string_manual_auto);
     option_menu_push_option(leds_manual);
 
-    // timer to update light sensor values
-    OptionUnion opt_led_t = option_u_new_timer("500ms", &err);
+    // Timer to update light sensor values
+    OptionUnion opt_led_t = option_u_new_timer("10s", &err);
     if(err == 1){
         #ifdef DEBUG
-                puts("500ms is not on the list of possible timing values\n");
+                puts("10s is not on the list of possible timing values\n");
         #endif
         return;
     }
-    Option leds_timer = option_new("timer to light", TIMER, opt_led_t, update_light_timer, to_string_timer_default);
+    Option leds_timer = option_new("light timer", TIMER, opt_led_t, update_light_timer, to_string_timer_default);
     option_menu_push_option(leds_timer);
 
     // light brightness threshold
@@ -108,7 +106,7 @@ void add_tasks_to_option_menu(){
         #endif
         return;
     }
-    Option temp_timer = option_new("timer to temp sensor", TIMER, opt_temp_t, update_temperature_timer, to_string_timer_default);
+    Option temp_timer = option_new("temp sensor timer", TIMER, opt_temp_t, update_temperature_timer, to_string_timer_default);
     option_menu_push_option(temp_timer);
 
     // higher temperature threshold
@@ -119,7 +117,7 @@ void add_tasks_to_option_menu(){
         #endif
         return;
     }
-    Option temp_higher_threshold = option_new("change temp higher threshold val", THRESHOLD, opt_temp_higher_thr, temp_set_higher_threshold, to_string_threshold_default);
+    Option temp_higher_threshold = option_new("change temp higher threshold", THRESHOLD, opt_temp_higher_thr, temp_set_higher_threshold, to_string_threshold_default);
     option_menu_push_option(temp_higher_threshold);
 
     // lower temperature threshold
@@ -130,7 +128,7 @@ void add_tasks_to_option_menu(){
         #endif
         return;
     }
-    Option temp_lower_threshold = option_new("change temp lower threshold val", THRESHOLD, opt_temp_lower_thr, temp_set_lower_threshold, to_string_threshold_default);
+    Option temp_lower_threshold = option_new("change temp lower threshold", THRESHOLD, opt_temp_lower_thr, temp_set_lower_threshold, to_string_threshold_default);
     option_menu_push_option(temp_lower_threshold);
 
     /*
@@ -138,14 +136,14 @@ void add_tasks_to_option_menu(){
      */
 
     // timer to update air sensor values
-    OptionUnion opt_air_t = option_u_new_timer("2s", &err);
+    OptionUnion opt_air_t = option_u_new_timer("20s", &err);
     if(err == 1){
         #ifdef DEBUG
-                puts("Current threshold exeeds the range\n");
+        puts("20s is not on the list of possible timing values\n");
         #endif
         return;
     }
-    Option air_timer = option_new("timer to air qual", TIMER, opt_air_t, update_air_timer, to_string_timer_default);
+    Option air_timer = option_new("air system timer", TIMER, opt_air_t, update_air_timer, to_string_timer_default);
     option_menu_push_option(air_timer);
 
 
@@ -157,7 +155,7 @@ void add_tasks_to_option_menu(){
         #endif
         return;
     }
-    Option air_threshold = option_new("change air threshold val", THRESHOLD, opt_air_thr, air_set_threshold, to_string_threshold_default);
+    Option air_threshold = option_new("change air threshold", THRESHOLD, opt_air_thr, air_set_threshold, to_string_threshold_default);
     option_menu_push_option(air_threshold);
 
     /*
