@@ -37,7 +37,7 @@
  *  defining the threshold values for the grow light *
  ******************************************************/
 // maximum brightness value for the grow light
-#define MAX_BRIGHTNESS 2500
+#define MAX_BRIGHTNESS 3000
 // minimum brightness value for the grow light
 #define MIN_BRIGHTNESS 500
 
