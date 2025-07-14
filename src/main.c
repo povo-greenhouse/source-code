@@ -39,6 +39,13 @@ void _graphicsInit()
         */
 }
 
+void to_string_manual_auto(char * buf, int32_t value, size_t buf_len){
+        if(value){
+            snprintf(buf,buf_len,"MANUAL");
+        }else{
+            snprintf(buf,buf_len,"AUTOMATIC");
+        }
+    }
 void add_tasks_to_option_menu(){
 
     int err;
@@ -56,6 +63,9 @@ void add_tasks_to_option_menu(){
     OptionUnion opt_led_s_power = option_u_new_switch(false);
     Option leds_switch = option_new("power leds", SWITCH, opt_led_s_power, power_on_or_off, to_string_switch_default);
     option_menu_push_option(leds_switch);
+
+
+
 
     // switch for the user to change between manual and automatic modes
     OptionUnion opt_led_s_mode = option_u_new_switch(false);

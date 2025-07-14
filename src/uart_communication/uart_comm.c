@@ -18,6 +18,9 @@ void uart_init(){
     uart_ctx.rx_buff.read_index = 0;
     uart_ctx.rx_overflow = false;
 
+
+
+
     //GPIO CONFIGURATION(P1.2,P1.3)
     GPIO_setAsPeripheralModuleFunctionInputPin(
           GPIO_PORT_P1,
@@ -224,10 +227,15 @@ void RMT_to_string(uint8_t * buffer, RxMessageType type){
     case CONTROLLER:
         strcpy(buffer,"CONTROLLER");
         break;
-    case WATER:
-        strcpy(buffer,"WATER");
+    case WATER1:
+        strcpy(buffer,"WATER1");
+        break;
+    case WATER2:
+        strcpy(buffer,"WATER2");
+        break;
     case AIR:
         strcpy(buffer,"AIR");
+        break;
     }
 }
 
@@ -235,9 +243,12 @@ RxMessageType RMT_from_string(const uint8_t * str,uint16_t len){
     if(strncmp(str,"CONTROLLER",10)== 0){
         return CONTROLLER;
     }
-    if(strncmp(str,"WATER",5)== 0){
-            return WATER;
+    if(strncmp(str,"WATER1",6)== 0){
+            return WATER1;
         }
+    if(strncmp(str,"WATER2",6)==0){
+            return WATER2;
+    }
     if(strncmp(str,"AIR",3)==0){
             return AIR;
         }
@@ -264,13 +275,16 @@ void handle_controller_msg(const char * buff,uint16_t len ){
    // Interrupt_enableMaster();
 }
 
-void handle_water_msg(const char * buff, uint16_t len){
-    int32_t val = atoi(buff);
+void handle_water_msg(const char * buff,size_t water_index, uint16_t len){
+    uint32_t val = (uint32_t) atoi(buff);
+    water_arr[water_index] = val;
+
+
 
 }
 void handle_air_msg(const char * buff, uint16_t len){
-    int32_t val = atoi(buff);
-
+    uint32_t val = (uint32_t) atoi(buff);
+    air_set_level(val);
 }
 void parse_msg(const uint8_t * buffer,uint16_t len){
 
@@ -287,9 +301,11 @@ void parse_msg(const uint8_t * buffer,uint16_t len){
         case CONTROLLER:
             handle_controller_msg(value_str, len-index);
             break;
-        case WATER:
-            handle_water_msg(value_str, len-index);
+        case WATER1:
+            handle_water_msg(value_str,0, len-index);
             break;
+        case WATER2:
+            handle_water_msg(value_str,1,len-index);
         case AIR:
             handle_air_msg(value_str,len-index);
             break;
