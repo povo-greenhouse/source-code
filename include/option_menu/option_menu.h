@@ -13,7 +13,8 @@
 #include "options.h"
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <ti/grlib/grlib.h>
-#define MAX_OPTIONS 20
+
+#define MAX_OPTIONS 40
 /*
     struct representing the list of options
     fields:
