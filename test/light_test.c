@@ -9,7 +9,7 @@ void light_test_initialization(){
     grow_light_init();
 
     assert(grow_light_get_brightness() == 0);
-    assert(grow_light_get_threshold() == 500);
+    assert(grow_light_get_threshold() == 1500);
     assert(is_grow_light_on() == 0);
     assert(grow_light_get_mode() == 0);
 
@@ -47,8 +47,8 @@ void light_test_threshold_operations(){
     grow_light_set_threshold(550);
     assert(grow_light_get_threshold() == 550);
 
-    grow_light_set_threshold(3000);
-    assert(grow_light_get_threshold() == 2500);
+    grow_light_set_threshold(6000);
+    assert(grow_light_get_threshold() == 3000);
 
     grow_light_set_threshold(0);
     assert(grow_light_get_threshold() == 500);
@@ -94,7 +94,7 @@ void light_test_update(){
     grow_light_set_mode(false);
     update_light_hal(0x6000); // 0
     assert(is_grow_light_on() == true);
-    assert(grow_light_get_brightness() == 2500);
+    assert(grow_light_get_brightness() == 3000);
 
     update_light_hal(0x80F0); // 960
     assert(is_grow_light_on() == false);
@@ -102,10 +102,10 @@ void light_test_update(){
 
     update_light_hal(0x60F0); // 240
     assert(is_grow_light_on() == 1);
-    assert(grow_light_get_brightness() == 1300);
+    assert(grow_light_get_brightness() == 1560);
     update_light_hal(0x70F0); // 480
     assert(is_grow_light_on() == 1);
-    assert(grow_light_get_brightness() == 100);
+    assert(grow_light_get_brightness() == 120);
 
 
     update_light_hal(0x90F0); // 1920

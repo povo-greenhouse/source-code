@@ -40,12 +40,12 @@ void temp_sensor_init() {
 #endif
 
     // Creating a task for updating temperature sensor data
-    // The task will call the update_temperature function every 1500 ms
+    // The task will call the update_temperature function every 5000 ms
     STask temp =  {
         update_temperature,  // Function to update temperature
-        5000,                // Task interval in milliseconds (20 seconds)
-        5000,                // Time to process task in milliseconds (20 seconds)
-        false                // Task status, initially set to true (active)
+        5000,                // Task interval in milliseconds (5 seconds)
+        5000,                // Time to process task in milliseconds (5 seconds)
+        true                 // Task status, initially set to true (active)
     };
 
     // Adding the temperature update task to the scheduler to ensure it runs periodically
@@ -102,10 +102,10 @@ void temp_set_current_temperature(uint8_t temperature) {
 
     ts.current_temperature = temperature;
 
-    #ifdef DEBUG
+   #ifdef DEBUG
     // Debug message to indicate the new temperature has been set
     printf("Current temperature set to %d \n", ts.current_temperature);
-    #endif
+   #endif
 
 }
 
@@ -166,33 +166,43 @@ void update_temperature(){
 
     #endif
 
+#ifdef DEBUG
+    printf("TEMPERATURE: %u\n", ambient_temp);
+#endif
+
     // Setting to the current temperature
     temp_set_current_temperature(ambient_temp);
 
     // Chceking if the current temperature is within the acceptable range
     int8_t comp = would_goldilocks_like_this();
 
-    // Out of range -> active buzzer
+    // Active buzzer if the temperature is outside the acceptable range
     if(comp != 0){
+
 #ifndef SOFTWARE_DEBUG
         send_data(2,0,1);
         send_data(2,1,0);
 #endif
-        // calling function to activate the buzzer
-        turn_on_buzzer();
+        // Calling function to activate the buzzer if in automatic mode
+        if(!get_buzzer_manual_mode()){
+            turn_on_buzzer();
+        }
     } else {
+        
 #ifndef SOFTWARE_DEBUG
         send_data(2,0,2);
 #endif
-        //calling function to deactivate buzzer
-        turn_off_buzzer(comp, exceeding_threshold());
+        // Calling function to deactivate buzzer if in automatic mode
+        if(!get_buzzer_manual_mode()){
+            turn_off_buzzer(comp, exceeding_threshold());
+        }
     }
     return;
 }
 
 #ifndef SOFTWARE_DEBUG
 void update_temperature_timer(int32_t new_timer){
-    // setting the new timer value as specified by user
+    // Setting the new timer value as specified by user
     task_list.task_array[ts.stack_pos].max_time = new_timer;
     return;
 }

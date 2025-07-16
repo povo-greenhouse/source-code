@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <math.h>
 
 #include "environment_systems/air_quality.h"
 #include "environment_systems/temperature.h"
@@ -15,7 +16,6 @@
 #ifndef SOFTWARE_DEBUG
 #include "scheduling/scheduler.h"
 #include "IOT/IOT_communication.h"
-//#include "sensing/sensing.h"
 
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #endif
@@ -24,7 +24,7 @@
 
 // Global air quality data structure
 static Air air = {
-    .threshold = 8500, // Default air quality threshold (ppm)
+    .threshold = 500, // Default air quality threshold (ppm)
     .current_level = 0,
     .stack_pos = 0
 };
@@ -33,7 +33,7 @@ static Air air = {
 
 // Global air quality for testing purposes
 static Air air = {
-    .threshold = 8500,
+    .threshold = 500,
     .current_level = 0
 };
 
@@ -129,7 +129,7 @@ uint32_t air_get_level(){
 
 bool exceeding_threshold(){
     // Check if current level exceeds threshold
-    if(air.current_level >= air.threshold){
+    if(air.current_level > air.threshold){
 
     #ifdef DEBUG
         // Debug message to indicate threshold has been exceeded
@@ -152,6 +152,54 @@ void update_air(){
 #ifndef SOFTWARE_DEBUG
     // Trigger a new ADC conversion
 
+    ADC14_toggleConversionTrigger();
+    // Wait for the ADC conversion to complete
+    while (ADC14_isBusy());
+
+     // Read the 14-bit ADC result from memory slot 2
+    uint32_t adcValue = ADC14_getResult(ADC_MEM2);
+
+    // Convert ADC value to voltage (0-3.3V range)
+    // 16383 is the maximum 14-bit value (2^14 - 1)
+    float adcVoltage = ((float) adcValue * VREF) / 16383.0f;
+    // Calculate sensor resistance (Rs) using refernce and calculated voltages
+    float Rs = RL * ((VCC / adcVoltage) - 1.0f);
+    // Calculate the ratio of current resistance to baseline resistance
+    float ratio = Rs / R0;
+    // Convert resistance ratio to gas concentration using logarithmic formula
+    float logppm = M * log10f(ratio) + B;
+    // Convert from log scale to actual ppm value
+    uint32_t level = (uint32_t) powf(10.0f, logppm);
+
+    // Update the system air quality level with the calculated value
+    air_set_level(level);
+
+    // Check if the new reading exceeds the safety threshold
+    bool exceeding = exceeding_threshold();
+
+    if(exceeding){ // Turns buzzer on if threshold is exceeding
+        // Sending data to IOT system to indicate air quality issue
+        send_data(1,0,1);
+        send_data(1,1,0);
+        // Calling function to activate the buzzer if in automatic mode
+        if(!get_buzzer_manual_mode()){
+            turn_on_buzzer();
+        }
+        
+    } else {
+        // Sending data to IOT system to indicate air quality is normal
+        send_data(1,0,2);
+        // Calling function to deactivate buzzer if in automatic mode
+        if(!get_buzzer_manual_mode()){
+            turn_off_buzzer(would_goldilocks_like_this(), exceeding);
+        }
+    }
+  #endif
+    return;
+  
+}
+
+
 //    ADC14_toggleConversionTrigger();
 //    // Wait for the ADC conversion to complete
 //    while (ADC14_isBusy());
@@ -171,24 +219,10 @@ void update_air(){
 //    float logppm = M * log10f(ratio) + B;
 //    // Convert from log scale to actual ppm value
 //    uint32_t level = (uint32_t) powf(10.0f, logppm);
-#endif
 
 
-    // Check if the new reading exceeds the safety threshold
-    bool exceeding = exceeding_threshold();
-
-    if(exceeding){ // Turns buzzer on if threshold is exceeded
-        // Calling function to activate the buzzer
-        turn_on_buzzer();
-    } else {
-        // Calling function to deactivate buzzer
-        turn_off_buzzer(would_goldilocks_like_this(), exceeding);
-    }
-    return;
-}
 
 #ifndef SOFTWARE_DEBUG
-#ifdef DEBUG
 float calibrateR0(int32_t no_samples) {
     float sumRs = 0.0f;      // Sum of all valid resistance readings
     int valid_samples = 0;   // Count of valid samples (non-zero voltage)
@@ -218,7 +252,7 @@ float calibrateR0(int32_t no_samples) {
     // Return the average resistance value
     return (sumRs / (float)valid_samples);
 }
-#endif
+
 void update_air_timer(int32_t new_timer){
     // setting the new timer value as specified by user
     task_list.task_array[air.stack_pos].max_time = new_timer;

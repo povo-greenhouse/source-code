@@ -7,6 +7,7 @@
 #include "scheduling/timer.h"
 #include "../test/scheduling_test.h"
 #include "option_menu/option_menu.h"
+#include "option_menu/options.h"
 #include "uart_communication/uart_comm.h"
 
 #include <stdio.h>
@@ -41,7 +42,6 @@ void _graphicsInit()
         */
 }
 
-
 void add_tasks_to_option_menu(){
 
     int err;
@@ -60,9 +60,9 @@ void add_tasks_to_option_menu(){
     Option leds_switch = option_new("power leds", SWITCH, opt_led_s_power, power_on_or_off, to_string_switch_default);
     option_menu_push_option(leds_switch);
 
-    // switch for the user to change between manual and automatic modes
+    // switch for the user to change between manual and automatic modes for the grow lights
     OptionUnion opt_led_s_mode = option_u_new_switch(false);
-    Option leds_manual = option_new("manual<->automatic", SWITCH, opt_led_s_mode, grow_light_set_mode, to_string_manual_auto);
+    Option leds_manual = option_new("light mode", SWITCH, opt_led_s_mode, grow_light_set_mode, to_string_manual_auto);
     option_menu_push_option(leds_manual);
 
     // Timer to update light sensor values
@@ -89,7 +89,7 @@ void add_tasks_to_option_menu(){
     option_menu_push_option(leds_threshold);
 
     /*
-     * options for temperature system (does not include activation of the buzzer)
+     * options for temperature system
      */
 
     // temperature variable function (not including buzzer)
@@ -126,7 +126,7 @@ void add_tasks_to_option_menu(){
     option_menu_push_option(temp_lower_threshold);
 
     /*
-     * options for air system (does not include activation of the buzzer)
+     * options for air system
      */
 
     // timer to update air sensor values
@@ -151,6 +151,19 @@ void add_tasks_to_option_menu(){
     }
     Option air_threshold = option_new("change air threshold", THRESHOLD, opt_air_thr, air_set_threshold, to_string_threshold_default);
     option_menu_push_option(air_threshold);
+
+    /*
+     * options for buzzer
+     */
+    // Switching buzzer on and off
+    OptionUnion opt_buzzer_s_power = option_u_new_switch(false);
+    Option buzzer_switch = option_new("power buzzer", SWITCH, opt_buzzer_s_power, manual_power_buzzer, to_string_switch_default);
+    option_menu_push_option(leds_switch);
+
+    // switch for the user to change between manual and automatic modes for the buzzer
+    OptionUnion opt_buzzer_s_mode = option_u_new_switch(false);
+    Option buzzer_manual = option_new("buzzer mode", SWITCH, opt_buzzer_s_mode, set_buzzer_mode, to_string_manual_auto);
+    option_menu_push_option(leds_manual);
 
     /*
      * options for water system
