@@ -204,7 +204,7 @@ Option option_new(char *name, OptionType type, OptionUnion value,
 void to_string_switch_default(char * buf, int32_t value,size_t buf_len);
 void to_string_threshold_default(char * buf, int32_t value,size_t buf_len);
 void to_string_timer_default(char * buf, int32_t value,size_t buf_len);
-
+void to_string_manual_auto(char * buf, int32_t value, size_t buf_len);
 
 /*
     functions to increment and decrement the option values

@@ -191,3 +191,10 @@ void to_string_timer_default(char * buf, int32_t value,size_t buf_len){
     snprintf(buf,buf_len,"%.*s",TIMER_AMOUNT_NAME_LEN + 1,timer_option_get_name_by_value(value));
 
 }
+void to_string_manual_auto(char * buf, int32_t value, size_t buf_len){
+    if(value){
+        snprintf(buf,buf_len,"MANUAL");
+    }else{
+        snprintf(buf,buf_len,"AUTOMATIC");
+    }
+}

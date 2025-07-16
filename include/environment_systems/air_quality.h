@@ -10,10 +10,10 @@
 #define VREF 3.3f // reference voltage (3.3V)
 #define VCC 5.0f // operational power of the MQ135 sensor (taken from the datasheet)
 #define RL 20000.0f // load resistance of the MQ135  sensor
-#define R0 337000.0f // sensor resistance in clean air (calibrated value)
+#define R0 40500.0f // sensor resistance in clean air (calibrated value)
 // M and B are calibration constants specific to the gas being measured
-#define M -2.769f // slope of the linear regression line for the MQ135 sensor
-#define B 2.067f // y-intercept of the linear regression line for the MQ135 sensor
+#define M -1.30f // slope of the linear regression line for the MQ135 sensor
+#define B 2.604f // y-intercept of the linear regression line for the MQ135 sensor
 
 /// @brief Structure to hold air quality data.
 ///
