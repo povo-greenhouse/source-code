@@ -41,13 +41,7 @@ void _graphicsInit()
         */
 }
 
-void to_string_manual_auto(char * buf, int32_t value, size_t buf_len){
-        if(value){
-            snprintf(buf,buf_len,"MANUAL");
-        }else{
-            snprintf(buf,buf_len,"AUTOMATIC");
-        }
-    }
+
 void add_tasks_to_option_menu(){
 
     int err;
@@ -161,7 +155,8 @@ void add_tasks_to_option_menu(){
     /*
      * options for water system
      */
-    // todo(add water system options);
+    // todo(add water system options);\
+    add_water_options()
     return;
 
 }

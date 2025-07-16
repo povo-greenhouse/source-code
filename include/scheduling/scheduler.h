@@ -31,7 +31,7 @@ typedef struct{
 } STask;
 
 
-#define N_PERIODIC_TASKS 10
+#define N_PERIODIC_TASKS 20
 /*
     List of the tasks that are periodically executed, used as a stack
     fields:
