@@ -312,6 +312,7 @@ void parse_msg(const uint8_t * buffer,uint16_t len){
             break;
         case WATER2:
             handle_water_msg(value_str,1,len-index);
+            break;
         case AIR:
             handle_air_msg(value_str,len-index);
             break;

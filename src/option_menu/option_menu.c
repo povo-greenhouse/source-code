@@ -10,6 +10,7 @@
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <ti/grlib/grlib.h>
 #include "scheduling/scheduler.h"
+#include "uart_communication/uart_comm.h"
 Graphics_Context * gc;
 
 struct {

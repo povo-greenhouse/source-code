@@ -9,14 +9,28 @@
 #define INCLUDE_WATER_MANAGEMENT_WATER_READING_H_
 
 
-#define N_SAMPLES 4
-int index_adc, index_checks, index_reservoire;
+//#define N_SAMPLES 4
+int index_tank, index_reservoire;
 bool block;
 
-void adc_init(void);
-void start_adc_conversion(void);
-void read_reservoir_level(void);
-void read_tank_level(void);
+//void adc_init(void);
+#define RESERVOIRE_TRESH_DEFAULT 25
+
+
+#define RESERVOIRE_EMPTY_THRESH_DEFAULT 10
+#define RESERVOIRE_LOW_THRESH_DEFAULT 80
+#define RESERVOIRE_MODERATE_THRESH_DEFAULT 150
+#define TANK_EMPTY_THRESH_DEFAULT 200
+
+#define READ_TANK_TIME_DEFAULT 2000
+#define READ_RESERVOIRE_TIME_DEFAULT 2000
+
+
+
+void read_tank(void);
+void read_reservoire(void);
+
+void add_water_reading_options();
 
 
 #endif /* INCLUDE_WATER_MANAGEMENT_WATER_READING_H_ */
