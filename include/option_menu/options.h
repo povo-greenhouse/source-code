@@ -96,6 +96,7 @@ int32_t timer_option_get_value(t_arr_index index);
  */
 char * timer_option_get_name(t_arr_index index);
 
+char * timer_option_get_name_by_value(int32_t val);
 /*
  * ------------------------------------------------------------
  *                      OPTION UNION

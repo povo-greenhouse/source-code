@@ -24,6 +24,7 @@
 #define PUMP2_PIN BIT6
 
 
+
 void pump_init() {
     printf("Executing: pump_init()\n");
     PUMP1_PORT->DIR |= PUMP1_PIN;
@@ -95,9 +96,20 @@ void upd_pump1_enable_time(int32_t val);
 void upd_pump2_enable_time(int32_t val);
 void upd_pump1_disable_time(int32_t val);
 void upd_pump2_disable_time(int32_t val);
+void upd_manual_mode(int32_t val);
+void upd_manual_pump1_status(int32_t val);
+void upd_manual_pump2_status(int32_t val);
+
 void add_pump_options(){
     int error;
+    OptionUnion manual_mode = option_u_new_switch(false);
+    option_menu_push_option(option_new("Pumps Manual Mode",SWITCH,manual_mode,upd_manual_mode,to_string_manual_auto));
 
+    OptionUnion pump1_toggled = option_u_new_switch(false);
+    option_menu_push_option(option_new("Pump 1 Status",SWITCH,pump1_toggled,upd_manual_pump1_status,to_string_switch_default));
+
+    OptionUnion pump2_toggled = option_u_new_switch(false);
+    option_menu_push_option(option_new("Pump 2 Status",SWITCH,pump2_toggled,upd_manual_pump2_status,to_string_switch_default));
 
     OptionUnion enable_pump1_time = option_u_new_timer(timer_option_get_name_by_value(PUMP1_ENABLE_TIME_DEFAULT),&error);
     option_menu_push_option(option_new("Pump 1 Enable Time",
@@ -152,4 +164,43 @@ void upd_pump2_disable_time(int32_t val){
 
 }
 
+void upd_manual_mode(int32_t val){
+    water_option_values.manual_mode = val;
+    //TODO: things this implies
+    if(val){
+        //MANUAL MODE
+        disable_task_at(activate_pump1_index);
+        disable_task_at(activate_pump2_index);
+        disable_task_at(deactivate_pump1_index);
+        disable_task_at(deactivate_pump2_index);
+        PUMP1_PORT->OUT &= ~PUMP1_PIN;
+        PUMP2_PORT->OUT &= ~PUMP2_PIN;
+    }else{
+        //AUTOMATIC MODE
+        //reactivate pump1 task
+        enable_task_at(activate_pump1_index);
+
+    }
+}
+
+void upd_manual_pump1_status(int32_t val){
+    water_option_values.pump1_enabled = val;
+    if(water_option_values.manual_mode){
+        if(val){
+            PUMP1_PORT->OUT |= PUMP1_PIN;
+        }else{
+            PUMP1_PORT->OUT &= ~PUMP1_PIN;
+        }
+    }
+}
+void upd_manual_pump2_status(int32_t val){
+    water_option_values.pump2_enabled = val;
+    if(water_option_values.pump2_enabled = val){
+        if(val){
+            PUMP2_PORT->OUT |= PUMP2_PIN;
+        }else{
+            PUMP2_PORT->OUT &= ~PUMP2_PIN;
+        }
+    }
+}
 
