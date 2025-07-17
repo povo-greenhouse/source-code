@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include "option_menu/option_menu_input.h"
 #include "option_menu/option_menu.h"
+#include "adc/adc.h"
+
 #define JOYSTICK_THRESHOLD_UP 10000
 #define JOYSTICK_THRESHOLD_DOWN 6000
 
@@ -72,37 +74,6 @@ void clear_input_queue(){
 }
 
 
-void option_menu_adc_init(){
-    #ifdef ADC_OPTION_MENU_WORKS
-    /* Configures Pin 6.0 and 4.4 as ADC input(vertical and horizontal joystick) */
-    GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P6,GPIO_PIN0,GPIO_TERTIARY_MODULE_FUNCTION);
-    GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P4,GPIO_PIN4,GPIO_TERTIARY_MODULE_FUNCTION);
-
-
-    //initializing ADC(ADCOSC/64/8)
-    ADC14_enableModule();
-    ADC14_initModule(ADC_CLOCKSOURCE_ADCOSC, ADC_PREDIVIDER_64, ADC_DIVIDER_8,0);
-
-    //configuring ADC memory with repeat
-    ADC14_configureMultiSequenceMode(ADC_MEM0, ADC_MEM1,true);
-    ADC14_configureConversionMemory(ADC_MEM0, ADC_VREFPOS_AVCC_VREFNEG_VSS, ADC_INPUT_A15, ADC_NONDIFFERENTIAL_INPUTS);
-
-    ADC14_configureConversionMemory(ADC_MEM1, ADC_VREFPOS_AVCC_VREFNEG_VSS, ADC_INPUT_A9, ADC_NONDIFFERENTIAL_INPUTS);
-
-    //enabling interrupt when a conversion is complete
-    ADC14_enableInterrupt(ADC_INT1);
-
-    //Enable interrupts
-    Interrupt_enableInterrupt(INT_ADC14);
-    //Interrupt_enableMaster();
-
-
-    ADC14_enableSampleTimer(ADC_AUTOMATIC_ITERATION);
-
-    ADC14_enableConversion();
-    ADC14_toggleConversionTrigger();
-    #endif
-}
 
 
 void buttons_init(){
@@ -201,25 +172,20 @@ void add_to_input_buffer(ControllerInputOption input){
     last_input = input;
     return;
 }
-#ifdef ADC_OPTION_MENU_WORKS
-
-void ADC14_IRQHandler(void){
-    uint64_t status = ADC14_getEnabledInterruptStatus();
-    ADC14_clearInterruptFlag(status);
-    if(status & ADC_INT1) {
 
 
+void handle_joystick_interrupt(uint64_t status){
+        #ifdef ADC_OPTION_MENU_WORKS
 
-        joystick_h_result = ADC14_getResult(ADC_MEM0);
-        joystick_v_result = ADC14_getResult(ADC_MEM1);
+        joystick_h_result = ADC14_getResult(Y_AXIS_MEM);
+        joystick_v_result = ADC14_getResult(X_AXIS_MEM);
         ControllerInputOption direction = get_joystick_direction(joystick_h_result,joystick_v_result);
         add_to_input_buffer(direction);
-
-
-    }
+        #endif
 
 }
-#endif
+
+
 ControllerInputOption option_input_from_str(char * buf, uint16_t len){
     if(strncmp(buf,"UP",2)==0){
             return UP;
@@ -249,6 +215,6 @@ ControllerInputOption option_input_from_str(char * buf, uint16_t len){
 void init_option_menu_input(){
     init_input_queue();
     buttons_init();
-    option_menu_adc_init();
+
 
 }

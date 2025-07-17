@@ -15,6 +15,9 @@
 #define M -1.30f // slope of the linear regression line for the MQ135 sensor
 #define B 2.604f // y-intercept of the linear regression line for the MQ135 sensor
 
+
+
+
 /// @brief Structure to hold air quality data.
 ///
 /// - threshold: The level over which the air quality is considered poor.
