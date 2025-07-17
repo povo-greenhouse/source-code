@@ -8,6 +8,9 @@
 #ifndef INCLUDE_OPTION_MENU_OPTION_MENU_INPUT_H_
 #define INCLUDE_OPTION_MENU_OPTION_MENU_INPUT_H_
 #include<string.h>
+#include<ti/devices/msp432p4xx/driverlib/driverlib.h>
+
+
 /*
     the possible inputs for the option menu
  */
@@ -47,6 +50,7 @@ int input_buffer_enqueue(ControllerInputOption input);
 //dequeues the last task, returning it
 ControllerInputOption input_buffer_dequeue();
 
+void handle_joystick_interrupt(uint64_t status);
 
 
 void init_option_menu_input(void);

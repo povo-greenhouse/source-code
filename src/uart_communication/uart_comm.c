@@ -79,7 +79,7 @@ int uart_buff_enqueue(volatile UART_Buffer * buff, uint8_t ch) {
 }
 inline uint16_t buff_available_space(volatile UART_Buffer * buff){
     if(buff->write_index >= buff->read_index){
-        return UART_BUF_LEN - (buff->write_index - buff->read_index);
+
         return UART_BUF_LEN + buff->read_index - buff->write_index -1;
 
     }
