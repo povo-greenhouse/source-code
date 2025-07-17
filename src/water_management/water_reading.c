@@ -9,7 +9,7 @@
 #include "water_management/pump_management.h"
 #include "water_management/water_init.h"
 #include "uart_communication/uart_comm.h"
-
+#include "option_menu/option_menu.h"
 #include "IOT/IOT_communication.h"
 #include "scheduling/scheduler.h"
 #include <stdbool.h>
