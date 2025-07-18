@@ -116,7 +116,9 @@ int8_t would_goldilocks_like_this() {
         // Debug message to indicate the temperature is too low
         puts("Temperature is too low\n");
         #endif
-
+#ifndef SOFTWARE_DEBUG
+        send_data(2, 0, 1);
+#endif
         return -1;
     }else if(ts.current_temperature > ts.higher_threshold){
 
@@ -124,19 +126,25 @@ int8_t would_goldilocks_like_this() {
         // Debug message to indicate the temperature is too high
         puts("Temperature is too high\n");
         #endif
-
+#ifndef SOFTWARE_DEBUG
+        send_data(2, 0, 3);
+#endif
         return 1;
     }else{
         #ifdef DEBUG
             // Debug message to indicate the temperature is within the acceptable range
             puts("Temperature is just right\n");
         #endif
-
+#ifndef SOFTWARE_DEBUG
+            send_data(2, 0, 2);
+#endif
         return 0;
     }
 }
 
 void update_temperature(){
+
+    send_data(2, 1, 0);
 
     uint8_t ambient_temp;
     #ifndef SOFTWARE_DEBUG
@@ -178,20 +186,11 @@ void update_temperature(){
 
     // Active buzzer if the temperature is outside the acceptable range
     if(comp != 0){
-
-#ifndef SOFTWARE_DEBUG
-        send_data(2,0,1);
-        send_data(2,1,0);
-#endif
         // Calling function to activate the buzzer if in automatic mode
         if(!get_buzzer_manual_mode()){
             turn_on_buzzer();
         }
     } else {
-        
-#ifndef SOFTWARE_DEBUG
-        send_data(2,0,2);
-#endif
         // Calling function to deactivate buzzer if in automatic mode
         if(!get_buzzer_manual_mode()){
             turn_off_buzzer(comp, exceeding_threshold());

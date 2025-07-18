@@ -72,8 +72,8 @@ void air_init(){
     // This task will run the update_air() function every 10 seconds
     STask air_qual = {
                       update_air,   // Function pointer to the update function
-                      20000,        // Task interval in milliseconds (10 seconds)
-                      20000,        // Maximum time allowed for task execution
+                      2000,        // Task interval in milliseconds (10 seconds)
+                      2000,        // Maximum time allowed for task execution
                       true          // Initial task status (active)
     };
     
@@ -149,10 +149,11 @@ bool exceeding_threshold(){
 
 #ifndef SOFTWARE_DEBUG
 void update_air(){
+    send_data(1, 1, 0);
     // Trigger a new ADC conversion
-    ADC14_toggleConversionTrigger();
+//    ADC14_toggleConversionTrigger();
     // Wait for the ADC conversion to complete
-    while (ADC14_isBusy());
+//    while (ADC14_isBusy());
 
      // Read the 14-bit ADC result from memory slot 2
     uint32_t adcValue = ADC14_getResult(AIR_SENSOR_MEM);
@@ -177,8 +178,7 @@ void update_air(){
 
     if(exceeding){ // Turns buzzer on if threshold is exceeding
         // Sending data to IOT system to indicate air quality issue
-        send_data(1,0,1);
-        send_data(1,1,0);
+        send_data(1,0,2);
         // Calling function to activate the buzzer if in automatic mode
         if(!get_buzzer_manual_mode()){
             turn_on_buzzer();
@@ -186,7 +186,7 @@ void update_air(){
         
     } else {
         // Sending data to IOT system to indicate air quality is normal
-        send_data(1,0,2);
+        send_data(1,0,1);
         // Calling function to deactivate buzzer if in automatic mode
         if(!get_buzzer_manual_mode()){
             turn_off_buzzer(would_goldilocks_like_this(), exceeding);
