@@ -43,39 +43,37 @@ static Air air = {
 void air_init(){
 
 #ifndef SOFTWARE_DEBUG
+    // Configure GPIO pin P4.3 as analog input for the MQ135 sensor to read the analog voltage output (uncomment the lines if using a msp with a working adc)
+    // GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P4,
+    //                                                GPIO_PIN3,
+    //                                                GPIO_TERTIARY_MODULE_FUNCTION);
 
-    // Configure GPIO pin P4.3 as analog input for the MQ135 sensor to read the analog voltage output
-//    GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P4,
-//                                                   GPIO_PIN3,
-//                                                   GPIO_TERTIARY_MODULE_FUNCTION);
-//
-//    // Initialize and enable the ADC14 module for analog-to-digital conversion
-//    ADC14_enableModule();
-//    // Uses main clock (MCLK) with no prescaling for maximum resolution
-//    ADC14_initModule(ADC_CLOCKSOURCE_MCLK, ADC_PREDIVIDER_1, ADC_DIVIDER_1, 0);
-//
-//    // Configure ADC memory slot 2 for single sample mode, to set up the storage of the conversion results
-//    ADC14_configureSingleSampleMode(ADC_MEM2, true);
-//
-//    // Configuring the conversion parameters
-//    ADC14_configureConversionMemory(ADC_MEM2,
-//        ADC_VREFPOS_AVCC_VREFNEG_VSS, // Uses AVCC (3.3V) as positive reference and VSS (0V) as negative reference
-//        ADC_INPUT_A10, // Read from analog input A10 (which corresponds to P4.3)
-//        false); // No differential input mode
-//
-//    // Enable sample timer in manual iteration mode, to trigger conversions manually when needed
-//    ADC14_enableSampleTimer(ADC_MANUAL_ITERATION);
-//
-//    // Enable the ADC for conversions
-//    ADC14_enableConversion();
+    // // Initialize and enable the ADC14 module for analog-to-digital conversion
+    // ADC14_enableModule();
+    // // Uses main clock (MCLK) with no prescaling for maximum resolution
+    // ADC14_initModule(ADC_CLOCKSOURCE_MCLK, ADC_PREDIVIDER_1, ADC_DIVIDER_1, 0);
 
+    // // Configure ADC memory slot 2 for single sample mode, to set up the storage of the conversion results
+    // ADC14_configureSingleSampleMode(ADC_MEM2, true);
+
+    // // Configuring the conversion parameters
+    // ADC14_configureConversionMemory(ADC_MEM2,
+    //     ADC_VREFPOS_AVCC_VREFNEG_VSS, // Uses AVCC (3.3V) as positive reference and VSS (0V) as negative reference
+    //     ADC_INPUT_A10, // Read from analog input A10 (which corresponds to P4.3)
+    //     false); // No differential input mode
+
+    // // Enable sample timer in manual iteration mode, to trigger conversions manually when needed
+    // ADC14_enableSampleTimer(ADC_MANUAL_ITERATION);
+
+    // // Enable the ADC for conversions
+    // ADC14_enableConversion();
 
     // Create a scheduled task for periodic air quality updates
     // This task will run the update_air() function every 10 seconds
     STask air_qual = {
                       update_air,   // Function pointer to the update function
-                      20000,        // Task interval in milliseconds (10 seconds)
-                      20000,        // Maximum time allowed for task execution
+                      2000,        // Task interval in milliseconds (10 seconds)
+                      2000,        // Maximum time allowed for task execution
                       true          // Initial task status (active)
     };
     
@@ -149,8 +147,9 @@ bool exceeding_threshold(){
     }
 }
 
-void update_air(){
 #ifndef SOFTWARE_DEBUG
+void update_air(){
+    send_data(1, 1, 0);
     // Trigger a new ADC conversion
 
 //    ADC14_toggleConversionTrigger();
@@ -180,8 +179,7 @@ void update_air(){
 
     if(exceeding){ // Turns buzzer on if threshold is exceeding
         // Sending data to IOT system to indicate air quality issue
-        send_data(1,0,1);
-        send_data(1,1,0);
+        send_data(1,0,2);
         // Calling function to activate the buzzer if in automatic mode
         if(!get_buzzer_manual_mode()){
             turn_on_buzzer();
@@ -189,39 +187,38 @@ void update_air(){
         
     } else {
         // Sending data to IOT system to indicate air quality is normal
-        send_data(1,0,2);
+        send_data(1,0,1);
         // Calling function to deactivate buzzer if in automatic mode
         if(!get_buzzer_manual_mode()){
             turn_off_buzzer(would_goldilocks_like_this(), exceeding);
         }
     }
-  #endif
     return;
-  
 }
 
+#else
 
-//    ADC14_toggleConversionTrigger();
-//    // Wait for the ADC conversion to complete
-//    while (ADC14_isBusy());
-//
-//    // Read the 14-bit ADC result from memory slot 2
-//    uint32_t adcValue = ADC14_getResult(ADC_MEM2);
-//    // Convert ADC value to voltage (0-3.3V range)
-//    // 16383 is the maximum 14-bit value (2^14 - 1)
-//    float adcVoltage = ((float) adcValue * VREF) / 16383.0f;
-//    // Compensates for voltage divider in the sensor circuit by a factor of 1.73
-//    float Vout = (adcVoltage * 1.73f);
-//    // Calculate sensor resistance (Rs) using voltage divider formula
-//    float Rs = RL * ((VCC / Vout) - 1.0f);
-//    // Calculate the ratio of current resistance to baseline resistance
-//    float ratio = Rs / R0;
-//    // Convert resistance ratio to gas concentration using logarithmic formula
-//    float logppm = M * log10f(ratio) + B;
-//    // Convert from log scale to actual ppm value
-//    uint32_t level = (uint32_t) powf(10.0f, logppm);
+void update_air_hal(uint32_t level){
+    // Update the system air quality level with the calculated value
+    air_set_level(level);
 
+    // Check if the new reading exceeds the safety threshold
+    bool exceeding = exceeding_threshold();
 
+    if(exceeding){ // Turns buzzer on if threshold is exceeded and in automatic mode 
+        // Calling function to activate the buzzer if in automatic mode
+        if(!get_buzzer_manual_mode()){
+            turn_on_buzzer();
+        }
+    } else {
+        // Calling function to deactivate buzzer if in automatic mode
+        if(!get_buzzer_manual_mode()){
+            turn_off_buzzer(would_goldilocks_like_this(), exceeding);
+        }
+    }
+    return;
+}
+#endif
 
 #ifndef SOFTWARE_DEBUG
 float calibrateR0(int32_t no_samples) {
