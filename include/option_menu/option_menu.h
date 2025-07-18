@@ -33,7 +33,7 @@ OptionList option_list;
 
 
 
-bool option_menu_is_enabled;
+
 /*
     initializes the option list
     to be called in main

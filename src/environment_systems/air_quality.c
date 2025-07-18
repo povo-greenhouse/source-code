@@ -153,9 +153,9 @@ void update_air(){
 #ifndef SOFTWARE_DEBUG
     // Trigger a new ADC conversion
 
-    ADC14_toggleConversionTrigger();
+//    ADC14_toggleConversionTrigger();
     // Wait for the ADC conversion to complete
-    while (ADC14_isBusy());
+//    while (ADC14_isBusy());
 
      // Read the 14-bit ADC result from memory slot 2
     uint32_t adcValue = ADC14_getResult(AIR_SENSOR_MEM);

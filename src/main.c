@@ -190,7 +190,7 @@ void _hwInit(){
     CS_initClockSignal(CS_SMCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
 
     // initializing the greenhouse systems
-    _graphicsInit();
+    //_graphicsInit();
     scheduler_init();
     timer_init();
     adc_init();

@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-
+#define DEBUG
 #ifndef SOFTWARE_DEBUG
 #include "scheduling/scheduler.h"
 #include "IOT/IOT_communication.h"
@@ -165,6 +165,7 @@ void update_temperature(){
     }
 
     #endif
+
 
 #ifdef DEBUG
     printf("TEMPERATURE: %u\n", ambient_temp);

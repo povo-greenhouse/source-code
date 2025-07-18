@@ -1,10 +1,10 @@
-/*
- * uart_comm.h
- *
- *  Created on: Jul 4, 2025
- *      Author: riginel
- */
 
+
+/*
+ * UART COMMUNICATION
+ * This module contains functions used to communicate through UART the contents of the Option Menu
+ *
+ */
 #ifndef INCLUDE_UART_COMMUNICATION_UART_COMM_H_
 #define INCLUDE_UART_COMMUNICATION_UART_COMM_H_
 
@@ -13,15 +13,17 @@
 #include <stdbool.h>
 #define UART_BUF_LEN 256
 #define READ_BUF_LEN 64
-
+//used by water reading to handle the data
 uint32_t water_arr[2];
 
+//4 types of messages received through UART
 typedef enum __RxMessageType {
     CONTROLLER,
     WATER1,
     WATER2,
     AIR
 }RxMessageType;
+
 void RMT_to_string(uint8_t * buffer, RxMessageType type);
 
 RxMessageType RMT_from_string(const uint8_t * str,uint16_t len);
