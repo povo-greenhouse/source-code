@@ -273,7 +273,7 @@ void handle_controller_msg(const char * buff,uint16_t len ){
     ControllerInputOption opt = option_input_from_str(buff,len);
     if(opt == JOYSTICK_SELECT){
 
-        option_menu_toggle();
+
         return;
     }
    // Interrupt_disableMaster();

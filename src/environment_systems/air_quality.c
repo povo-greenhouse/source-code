@@ -151,6 +151,7 @@ bool exceeding_threshold(){
 void update_air(){
     send_data(1, 1, 0);
     // Trigger a new ADC conversion
+
 //    ADC14_toggleConversionTrigger();
     // Wait for the ADC conversion to complete
 //    while (ADC14_isBusy());

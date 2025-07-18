@@ -17,13 +17,13 @@ growing lights:
 	- PIN 7.7 CCR
 IOT:
 	- PIN 2.3
-	- PIN 5.1
+	- PIN 6.7
 	- PIN 3.5
 	- PIN 3.7
 	- PIN 5.7
-	- PIN 3.0
+	- PIN 1.6
 	- PIN 1.7
-	- PIN 5.0
+	- PIN 6.6
 	- PIN 5.2
 	- PIN 3.6
 buzzer:
