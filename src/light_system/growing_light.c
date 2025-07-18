@@ -10,7 +10,7 @@
 
 #include "msp.h"
 #include "ti/devices/msp432p4xx/driverlib/driverlib.h"
-#include "../../lib/HAL_I2C.h"
+#include "../lib/HAL_I2C.h"
 
 // Initializing the grow light structure to hold the current state of the grow light system
 GrowLight gl= {.current_brightness = 0, .threshold = 1500, .manual_mode = false, .on = false, .stack_pos=0};
@@ -65,8 +65,8 @@ void grow_light_init(){
         // The task will call the update_light function every 500 ms
         STask light = {
             update_light,    // Function to update the grow light
-            10000,            // Task interval in milliseconds (10 second)
-            10000,            // Time until task is processed in milliseconds (10 second)
+            2000,            // Task interval in milliseconds (10 second)
+            2000,            // Time until task is processed in milliseconds (10 second)
             true             // Task status, initially set to true (active)
         };
 
@@ -124,16 +124,6 @@ void grow_light_set_brightness(uint32_t brightness){
     printf("PWM Brightness set to %u\n", brightness);
 #endif
 
-#ifndef SOFTWARE_DEBUG
-    if(brightness < MIN_BRIGHTNESS){
-        send_data(5,0,4);
-    } else if (brightness < MAX_BRIGHTNESS){
-        send_data(5,0,3);
-    } else {
-        send_data(5,0,2);
-    }
-    send_data(5,1,0);
-#endif
     return;
 }
 
@@ -220,6 +210,7 @@ void update_light(){
 
     if(!gl.manual_mode){ // If the grow light is not in manual mode, read the sensor value from the OPT3001 light sensor
 
+        send_data(5,1,0);
         uint32_t exponent = 0;
         uint32_t sensor_val = 0;
         int32_t raw;
@@ -271,6 +262,19 @@ void update_light(){
             }
         }
         grow_light_set_brightness(calculated_brightness);
+
+#ifndef SOFTWARE_DEBUG
+    if(sensor_val < MIN_BRIGHTNESS){
+        puts("Too dark!\n\n");
+        send_data(5,0,1);
+    } else if (sensor_val < MAX_BRIGHTNESS){
+        puts("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee!\n\n");
+        send_data(5,0,2);
+    } else {
+        puts("Too bright!\n\n");
+        send_data(5,0,3);
+    }
+#endif
     }
     return;
 }
@@ -334,12 +338,11 @@ void TA1_N_IRQHandler(void) {
 
     // Check Timer overflow
     // Check and clear overflow interrupt (TAIFG)
-        if (TIMER_A1->CTL & TIMER_A_CTL_IFG) {
-            TIMER_A1->CTL &= ~TIMER_A_CTL_IFG;
-            GPIO_setOutputHighOnPin(LED_PORT, LED_PIN);
-        }
+    if (TIMER_A1->CTL & TIMER_A_CTL_IFG) {
+        TIMER_A1->CTL &= ~TIMER_A_CTL_IFG;
+        GPIO_setOutputHighOnPin(LED_PORT, LED_PIN);
+    }
 }
-
 
 void update_light_timer(int32_t new_timer){
     // setting the new timer value as specified by user

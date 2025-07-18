@@ -9,6 +9,10 @@
 #include "option_menu/option_menu.h"
 #include "option_menu/options.h"
 #include "uart_communication/uart_comm.h"
+#include "water_management/water_init.h"
+#include "water_management/water_reading.h"
+#include "water_management/pump_management.h"
+#include "adc/adc.h"
 
 #include <stdio.h>
 
@@ -16,10 +20,6 @@
 #include <ti/grlib/grlib.h>
 #include "../lib/HAL_I2C.h"
 #include "../include/LcdDriver/Crystalfontz128x128_ST7735.h"
-#include "water_management/water_init.h"
-#include "water_management/water_reading.h"
-#include "water_management/pump_management.h"
-#include "adc/adc.h"
 Graphics_Context g_sContext;
 
 
@@ -185,8 +185,9 @@ void _hwInit(){
     WDT_A_holdTimer();
     Interrupt_disableMaster();
 
-    // initializing SMCLK
+    // Setting DCO to 3MHz
     CS_setDCOCenteredFrequency(CS_DCO_FREQUENCY_3);
+    // Setting SMCLK to DCO at 3MHz
     CS_initClockSignal(CS_SMCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
 
     // initializing the greenhouse systems
