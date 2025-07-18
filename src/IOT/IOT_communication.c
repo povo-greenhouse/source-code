@@ -14,11 +14,11 @@ void init_GPIOs_IOT(){
             P2->DIR  |= BIT3;               // Set as output
             P2->OUT|=BIT3;                  // Set 1
 
-            P5->SEL0 &= ~BIT1;//bit 8 port 10
-            P5->SEL1 &= ~BIT1;
-            P5->DIR  |= BIT1;
-            P5->OUT|=BIT1;
-
+            P6->SEL0 &= ~BIT7;//bit 8 port 10
+            P6->SEL1 &= ~BIT7;
+            P6->DIR  |= BIT7;
+            P6->OUT|=BIT7;
+            
             P3->SEL0 &= ~BIT5;//bit 7 port 9
             P3->SEL1 &= ~BIT5;
             P3->DIR  |= BIT5;
@@ -35,10 +35,10 @@ void init_GPIOs_IOT(){
             P5->DIR  |= BIT7;
             P5->OUT|=BIT7;
 
-            P1->SEL0 &= ~BIT6;//bit 4 port 6
-            P1->SEL1 &= ~BIT6;
-            P1->DIR  |= BIT6;
-            P1->OUT|=BIT6;
+            P3->SEL0 &= ~BIT0;//bit 4 port 6
+            P3->SEL1 &= ~BIT0;
+            P3->DIR  |= BIT0;
+            P3->OUT|=BIT0;
 
 
             P1->SEL0 &= ~BIT7;//bit 3 port 5
@@ -51,10 +51,10 @@ void init_GPIOs_IOT(){
             P5->DIR  |= BIT0;
             P5->OUT|=BIT0;
 
-            P5->SEL0 &= ~BIT2;//bit 1 port 3
-            P5->SEL1 &= ~BIT2;
-            P5->DIR  |= BIT2;
-            P5->OUT|=BIT2;
+            P6->SEL0 &= ~BIT6;//bit 1 port 3
+            P6->SEL1 &= ~BIT6;
+            P6->DIR  |= BIT6;
+            P6->OUT|=BIT6;
 
             P3->SEL0 &= ~BIT6;//bit 0 port 2 (select)
             P3->SEL1 &= ~BIT6;
@@ -67,37 +67,37 @@ void send_data(int code, bool active, int value){
     switch(code){
                 case 1: // 110 AIR
                     P2->OUT |=  BIT3;
-                    P5->OUT |=  BIT1;
+                    P6->OUT |=  BIT7;
                     P3->OUT &= ~BIT5;
                     break;
                 case 2: // 101 TEMP
                     P2->OUT |=  BIT3;
-                    P5->OUT &= ~BIT1;
+                    P6->OUT &= ~BIT7;
                     P3->OUT |=  BIT5;
                     break;
                 case 3: // 100  WATER TANK
                     P2->OUT |=  BIT3;
-                    P5->OUT &= ~BIT1;
+                    P6->OUT &= ~BIT7;
                     P3->OUT &= ~BIT5;
                     break;
                 case 4: // 011  RESERVOIRE
                     P2->OUT &= ~BIT3;
-                    P5->OUT |=  BIT1;
+                    P6->OUT |=  BIT7;
                     P3->OUT |=  BIT5;
                     break;
                 case 5: // 010  LIGHT
                     P2->OUT &= ~BIT3;
-                    P5->OUT |=  BIT1;
+                    P6->OUT |=  BIT7;
                     P3->OUT &= ~BIT5;
                     break;
                 case 6: // 001  PUMP 1
                     P2->OUT &= ~BIT3;
-                    P5->OUT &= ~BIT1;
+                    P6->OUT &= ~BIT7;
                     P3->OUT |=  BIT5;
                     break;
                 case 7: // 000  PUMP 2
                     P2->OUT &= ~BIT3;
-                    P5->OUT &= ~BIT1;
+                    P6->OUT &= ~BIT7;
                     P3->OUT &= ~BIT5;
                     break;
             }
