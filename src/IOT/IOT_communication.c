@@ -18,7 +18,7 @@ void init_GPIOs_IOT(){
             P6->SEL1 &= ~BIT7;
             P6->DIR  |= BIT7;
             P6->OUT|=BIT7;
-
+            
             P3->SEL0 &= ~BIT5;//bit 7 port 9
             P3->SEL1 &= ~BIT5;
             P3->DIR  |= BIT5;
