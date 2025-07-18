@@ -17,6 +17,7 @@
 #include "scheduling/scheduler.h"
 #include "IOT/IOT_communication.h"
 
+#include "adc/adc.h"
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #endif
 
@@ -154,7 +155,7 @@ void update_air(){
     while (ADC14_isBusy());
 
      // Read the 14-bit ADC result from memory slot 2
-    uint32_t adcValue = ADC14_getResult(ADC_MEM2);
+    uint32_t adcValue = ADC14_getResult(AIR_SENSOR_MEM);
 
     // Convert ADC value to voltage (0-3.3V range)
     // 16383 is the maximum 14-bit value (2^14 - 1)

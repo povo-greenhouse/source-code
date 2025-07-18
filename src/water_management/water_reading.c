@@ -14,7 +14,7 @@
 #include "scheduling/scheduler.h"
 #include <stdbool.h>
 #include <stdio.h>
-
+#include "adc/adc.h"
 void read_reservoire(){
     uint32_t res_value=water_arr[0];
     if(res_value<=water_option_values.reservoire_empty_threshold){
@@ -136,6 +136,13 @@ void upd_res_read_time(int32_t val){
     task_list.task_array[index_reservoire].max_time=val;
 
 }
+
+
+void handle_water_level_interrupt(uint64_t status){
+    water_arr[0] = (int32_t)ADC14_getResult(TANK_SENSOR_MEM);
+    water_arr[1] = (int32_t)ADC14_getResult(RESERVOIRE_SENSOR_MEM);
+}
+
 // _________________________OLD CODE USING ADC 14___________________________________________________
 //
 //int old_value=0,old_value_1 = 0 ,limit=0, first_value=0,first_value_1 = 0;;

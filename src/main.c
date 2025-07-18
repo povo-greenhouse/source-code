@@ -12,6 +12,7 @@
 #include "water_management/water_init.h"
 #include "water_management/water_reading.h"
 #include "water_management/pump_management.h"
+#include "adc/adc.h"
 
 #include <stdio.h>
 
@@ -20,6 +21,7 @@
 #include "../lib/HAL_I2C.h"
 #include "../include/LcdDriver/Crystalfontz128x128_ST7735.h"
 Graphics_Context g_sContext;
+
 
 void _graphicsInit()
 {
@@ -168,8 +170,8 @@ void add_tasks_to_option_menu(){
     /*
      * options for water system
      */
-    // todo(add water system options);\
-    add_water_options()
+    // todo(add water system options);
+    add_water_options();
     return;
 
 }
@@ -192,6 +194,7 @@ void _hwInit(){
     _graphicsInit();
     scheduler_init();
     timer_init();
+    adc_init();
     option_menu_init(&g_sContext);
     add_tasks_to_option_menu();
 
