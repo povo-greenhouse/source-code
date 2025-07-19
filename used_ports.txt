@@ -21,7 +21,7 @@ IOT:
 	- PIN 3.5
 	- PIN 3.7
 	- PIN 5.7
-	- PIN 1.6
+	- PIN 3.0
 	- PIN 1.7
 	- PIN 6.6
 	- PIN 5.2
