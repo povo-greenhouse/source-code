@@ -2,10 +2,13 @@
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include "uart_communication/uart_comm.h"
 #include "option_menu/option_menu_input.h"
+#include "environment_systems/air_quality.h"
 #include "scheduling/scheduler.h"
+#include "scheduling/timer.h"
 #include <string.h>
-#include<stdbool.h>
-
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #define SEP '$'
 void uart_init(){
@@ -117,7 +120,7 @@ void EUSCIA0_IRQHandler(void) {
         //send next char in queue
         int error = 0;
         uint8_t next_ch = uart_buff_dequeue(&uart_ctx.tx_buff,&error);
-        UART_Context * uart_ctx_ptr = &uart_ctx;
+//        UART_Context * uart_ctx_ptr = &uart_ctx;
         if(error == 0){
             UART_transmitData(EUSCI_A0_BASE, next_ch);
            // printf("transmitted %c\n",next_ch);
@@ -257,6 +260,7 @@ RxMessageType RMT_from_string(const uint8_t * str,uint16_t len){
     if(strncmp(str,"AIR",3)==0){
             return AIR;
         }
+    return AIR;
 }
 
 void handle_msg(){

@@ -5,13 +5,12 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-#define DEBUG
 #ifndef SOFTWARE_DEBUG
 #include "scheduling/scheduler.h"
 #include "IOT/IOT_communication.h"
 
 #include "msp.h"
-#include "../../lib/HAL_I2C.h"
+#include "../lib/HAL_I2C.h"
 
 // Initialization of the temperature sensor to hold temperature sensor data
 static TemperatureSensor ts = {.current_temperature = 21, .higher_threshold = 30, .lower_threshold = 20, .stack_pos=0};
@@ -43,8 +42,8 @@ void temp_sensor_init() {
     // The task will call the update_temperature function every 5000 ms
     STask temp =  {
         update_temperature,  // Function to update temperature
-        5000,                // Task interval in milliseconds (5 seconds)
-        5000,                // Time to process task in milliseconds (5 seconds)
+        5500,                // Task interval in milliseconds (5 seconds)
+        5500,                // Time to process task in milliseconds (5 seconds)
         true                 // Task status, initially set to true (active)
     };
 
@@ -173,7 +172,6 @@ void update_temperature(){
     }
 
     #endif
-
 
 #ifdef DEBUG
     printf("TEMPERATURE: %u\n", ambient_temp);

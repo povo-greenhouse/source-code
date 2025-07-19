@@ -7,10 +7,12 @@
 
 #include "option_menu/option_menu.h"
 #include "option_menu/option_menu_input.h"
-#include <ti/devices/msp432p4xx/driverlib/driverlib.h>
-#include <ti/grlib/grlib.h>
 #include "scheduling/scheduler.h"
 #include "uart_communication/uart_comm.h"
+#include <ti/devices/msp432p4xx/driverlib/driverlib.h>
+#include <ti/grlib/grlib.h>
+#include <stdio.h>
+
 Graphics_Context * gc;
 
 struct {

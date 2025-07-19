@@ -52,7 +52,7 @@ typedef struct {
     fp_rx_callback rx_data_callback; // RX data callback
 } UART_Context;
 
-volatile UART_Context uart_ctx;
+UART_Context uart_ctx;
 
 
 /*
