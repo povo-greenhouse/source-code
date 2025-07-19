@@ -65,8 +65,8 @@ void grow_light_init(){
         // The task will call the update_light function every 500 ms
         STask light = {
             update_light,    // Function to update the grow light
-            2000,            // Task interval in milliseconds (10 second)
-            2000,            // Time until task is processed in milliseconds (10 second)
+            10500,            // Task interval in milliseconds (10.5 second)
+            10500,            // Time until task is processed in milliseconds (10.5 second)
             true             // Task status, initially set to true (active)
         };
 
@@ -265,13 +265,10 @@ void update_light(){
 
 #ifndef SOFTWARE_DEBUG
     if(sensor_val < MIN_BRIGHTNESS){
-        puts("Too dark!\n\n");
         send_data(5,0,1);
     } else if (sensor_val < MAX_BRIGHTNESS){
-        puts("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee!\n\n");
         send_data(5,0,2);
     } else {
-        puts("Too bright!\n\n");
         send_data(5,0,3);
     }
 #endif

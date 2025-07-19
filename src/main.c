@@ -207,7 +207,7 @@ void _hwInit(){
 
     water_init();
     init_GPIOs_IOT();
-    uart_init();
+//    uart_init();
     // enabling interrupts
     Interrupt_enableInterrupt(INT_TA1_N);
     Interrupt_enableMaster();
@@ -219,14 +219,9 @@ void main(void){
 
     _hwInit();
 
-
     while(1){
-
       if(scheduler_state == AWAKE){
            scheduler();
        }
-       __WFI();
-
-
     }
 }

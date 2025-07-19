@@ -5,6 +5,7 @@
  *      Author: vince
  */
 #include <stdbool.h>
+#include <stdint.h>
 #ifndef INCLUDE_WATER_MANAGEMENT_WATER_READING_H_
 #define INCLUDE_WATER_MANAGEMENT_WATER_READING_H_
 
@@ -25,13 +26,13 @@ bool block;
 #define RESERVOIRE_TRESH_DEFAULT 25
 
 
-#define RESERVOIRE_EMPTY_THRESH_DEFAULT 10
-#define RESERVOIRE_LOW_THRESH_DEFAULT 80
-#define RESERVOIRE_MODERATE_THRESH_DEFAULT 150
-#define TANK_EMPTY_THRESH_DEFAULT 200
+#define RESERVOIRE_EMPTY_THRESH_DEFAULT 1000
+#define RESERVOIRE_LOW_THRESH_DEFAULT 3000
+#define RESERVOIRE_MODERATE_THRESH_DEFAULT 4500
+#define TANK_EMPTY_THRESH_DEFAULT 6000
 
 #define READ_TANK_TIME_DEFAULT 2000
-#define READ_RESERVOIRE_TIME_DEFAULT 2000
+#define READ_RESERVOIRE_TIME_DEFAULT 1500
 
 
 
@@ -39,6 +40,15 @@ void read_tank(void);
 void read_reservoire(void);
 
 void add_water_reading_options();
+
+void upd_res_empty_threshold(int32_t);
+void upd_res_low_threshold(int32_t);
+void upd_res_moderate_threshold(int32_t);
+void upd_tank_empty_threshold(int32_t);
+void upd_tank_read_time(int32_t);
+void upd_res_read_time(int32_t);
+
+void handle_water_level_interrupt(uint64_t);
 
 
 #endif /* INCLUDE_WATER_MANAGEMENT_WATER_READING_H_ */

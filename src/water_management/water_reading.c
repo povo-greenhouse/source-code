@@ -17,19 +17,18 @@
 #include "adc/adc.h"
 void read_reservoire(){
     uint32_t res_value=water_arr[0];
-    if(res_value<=water_option_values.reservoire_empty_threshold){
+    if(res_value < water_option_values.reservoire_empty_threshold){
         send_data(4, 1, 4);
         printf("Reservoire empty \n");
     }
-    else if (res_value>=water_option_values.reservoire_empty_threshold && res_value<water_option_values.reservoire_low_threshold){
+    else if (res_value < water_option_values.reservoire_low_threshold){
         send_data(4, 1, 3)  ;
         printf("Low water in the Reservoir \n");
     }
-    else if (res_value>=water_option_values.reservoire_low_threshold && res_value<water_option_values.reservoire_moderate_threshold){
+    else if (res_value < water_option_values.reservoire_moderate_threshold){
         send_data(4, 0, 2);
         printf("Moderate water  in the Reservoir \n");
-    }
-    else if (res_value>=water_option_values.reservoire_moderate_threshold ){
+    } else {
         send_data(4, 0, 1);
         printf("Reservoire full \n");
     }
@@ -39,25 +38,18 @@ void read_reservoire(){
 
 void read_tank(){
     uint32_t tank_value=water_arr[1];
-    if(tank_value>water_option_values.tank_empty_threshold){
+    if(tank_value > water_option_values.tank_empty_threshold){
         P4->OUT &= ~BIT7;
         send_data(3, 1, 0);
         block = true;
-        printf("Tank full! pumps have been blocked");
+        printf("Tank full! pumps have been blocked\n");
     }else{
-        block=false;
+        block = false;
         send_data(3, 0, 0);
-        printf("Tank empty! good to go");
+        printf("Tank empty! good to go\n");
     }
 }
 
-
-void upd_res_empty_threshold(int32_t val);
-void upd_res_low_threshold(int32_t val);
-void upd_res_moderate_threshold(int32_t val);
-void upd_tank_empty_threshold(int32_t val);
-void upd_tank_read_time(int32_t val);
-void upd_res_read_time(int32_t val);
 void add_water_reading_options(){
     int error;
     OptionUnion res_empty_thresh = option_u_new_threshold(RESERVOIRE_EMPTY_THRESH_DEFAULT,0,20,1,&error);

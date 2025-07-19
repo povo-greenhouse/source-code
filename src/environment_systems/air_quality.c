@@ -2,6 +2,9 @@
  * This file implements air quality monitoring using an MQ135 gas sensor
  * The MQ135 can detect various gases including CO2, NH3, NOx, alcohol, benzene, smoke, etc.
  */
+#include "environment_systems/air_quality.h"
+#include "environment_systems/temperature.h"
+#include "environment_systems/buzzer.h"
 
 #include <stdio.h>
 #include <stdint.h>
@@ -9,14 +12,9 @@
 #include <stdbool.h>
 #include <math.h>
 
-#include "environment_systems/air_quality.h"
-#include "environment_systems/temperature.h"
-#include "environment_systems/buzzer.h"
-
 #ifndef SOFTWARE_DEBUG
 #include "scheduling/scheduler.h"
 #include "IOT/IOT_communication.h"
-
 #include "adc/adc.h"
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #endif
@@ -41,6 +39,10 @@ static Air air = {
 #endif
 
 void air_init(){
+#ifdef DEBUG
+    // Debug message to confirm initialization
+    puts("Air initialized\n");
+#endif
 
 #ifndef SOFTWARE_DEBUG
     // Configure GPIO pin P4.3 as analog input for the MQ135 sensor to read the analog voltage output (uncomment the lines if using a msp with a working adc)
@@ -72,8 +74,8 @@ void air_init(){
     // This task will run the update_air() function every 10 seconds
     STask air_qual = {
                       update_air,   // Function pointer to the update function
-                      2000,        // Task interval in milliseconds (10 seconds)
-                      2000,        // Maximum time allowed for task execution
+                      11500,        // Task interval in milliseconds (11.5 seconds)
+                      11500,        // Maximum time allowed for task execution
                       true          // Initial task status (active)
     };
     
@@ -84,13 +86,6 @@ void air_init(){
 #ifdef DEBUG
     // Debug confirmation that task was added successfully
     puts("Added air quality task to stack\n");
-#endif
-
-
-
-#ifdef DEBUG
-    // Debug message to confirm initialization
-    puts("Air initialized\n");
 #endif
 
     return;
@@ -150,8 +145,8 @@ bool exceeding_threshold(){
 #ifndef SOFTWARE_DEBUG
 void update_air(){
     send_data(1, 1, 0);
+    // Commented to prevent collisions with the interrupt handler
     // Trigger a new ADC conversion
-
 //    ADC14_toggleConversionTrigger();
     // Wait for the ADC conversion to complete
 //    while (ADC14_isBusy());
