@@ -7,11 +7,14 @@
 #ifndef SOFTWARE_DEBUG
 #include "scheduling/scheduler.h"
 
+// GPIO pin for the LED light
 #define LED_PORT GPIO_PORT_P1
 #define LED_PIN GPIO_PIN0
 
+// GPIO pin for the PWM output (CCR1)
 #define CCR1_PORT GPIO_PORT_P7
 #define CCR1_PIN GPIO_PIN7
+
 // address of the OPT3001 light sensor
 #define OPT3001_SLAVE_ADDRESS 0x44
 
@@ -33,6 +36,36 @@
 
 #endif
 
+// Default light threshold value (when to turn lights on/off)
+#define DEFAULT_THRESHOLD 1500
+
+// How often our light update task runs (in milliseconds)
+#define TASK_INTERVAL_MS 10500         // 10.5 seconds
+
+/***************************************************************************
+ *  PWM (Pulse Width Modulation) settings for controlling light brightness *
+ ***************************************************************************/
+#define PWM_FREQUENCY_HZ 1200          // How fast PWM pulses (1200 times per second)
+#define SMCLK_FREQUENCY_MHZ 3000000    // Microcontroller clock speed (3 MHz)
+#define PWM_PERIOD (SMCLK_FREQUENCY_MHZ / PWM_FREQUENCY_HZ)  // Calculate PWM period
+
+/*****************************************
+ *  Bit masks for processing sensor data *
+ *****************************************/
+// These help us extract specific parts of the sensor reading
+#define SENSOR_EXPONENT_MASK 0x000F    // Last 4 bits (0000111100001111 in binary)
+#define SENSOR_VALUE_MASK 0x0FFF       // First 12 bits (000011111111111 in binary)
+#define SENSOR_EXPONENT_SHIFT 12       // How many positions to shift to get exponent
+
+/************************************
+ *  Constants for IoT communication *
+ ************************************/
+// These numbers represent different light levels we send to other systems
+#define IOT_LIGHT_SENSOR_ID 5          // ID number for our light sensor
+#define IOT_LIGHT_DARK 1               // Code for "dark" condition
+#define IOT_LIGHT_MEDIUM 2             // Code for "medium light" condition
+#define IOT_LIGHT_BRIGHT 3             // Code for "bright light" condition
+
 /******************************************************
  *  defining the threshold values for the grow light *
  ******************************************************/
@@ -40,6 +73,7 @@
 #define MAX_BRIGHTNESS 3000
 // minimum brightness value for the grow light
 #define MIN_BRIGHTNESS 500
+
 
 /// @brief Structure to hold the grow light system data.
 ///
@@ -63,89 +97,234 @@ typedef struct GrowLight{
 #endif
 }GrowLight;
 
-/// @brief Initializes the grow light system.
-/// The function sets up the GPIO pin for the grow light, configures the timer for PWM output,
-/// and initializes the OPT3001 light sensor.
-/// It also creates a task to update the light system at regular intervals 
-/// and pushes it to the scheduler.
+/**
+ * @brief Applies scaling factor to sensor value based on exponent
+ * 
+ * This function does the math to convert the light sensor data, which has a special format, by scaling
+ * the reading based on an exponent value.
+ * 
+ * @param sensor_val Raw sensor value from the lower 12 bits of sensor data
+ * @param exponent Scaling exponent from upper 4 bits of sensor data
+ * @return Scaled sensor value that represents actual light level
+ */
+static uint32_t apply_sensor_scaling(uint32_t, uint32_t);
+
+/**
+ * @brief Processes raw sensor data from OPT3001 light sensor
+ * 
+ * The sensor gives us a 16-bit number that contains both the light reading
+ * and scaling information packed together. This function separates them.
+ * 
+ * @param raw Raw 16-bit value from sensor (contains both data and scaling info)
+ * @return Processed sensor value that represents actual light level
+ */
+static uint32_t process_sensor_data(uint32_t);
+
+/**
+ * @brief Calculates how bright our grow lights should be
+ * 
+ * This function implements our main logic: when it's dark outside,
+ * turn on the grow lights. The darker it is, the brighter our lights should be.
+ * 
+ * @param sensor_val Current light level reading from the sensor
+ * @return Calculated brightness value [0 to MAX_BRIGHTNESS]
+ *         0 = lights off, MAX_BRIGHTNESS = full brightness
+ */
+static uint32_t calculate_brightness(uint32_t sensor_val);
+
+/**
+ * @brief Sends light level information to IoT (Internet of Things) systems
+ * 
+ * This function tells other connected systems about the current light conditions.
+ * For example, it might send data to a phone app or web dashboard.
+ * 
+ * @param sensor_val Current light level reading from our sensor
+ */
+static void send_light_level_data(uint32_t sensor_val);
+
+/**
+ * @brief Controls the physical LED lights and PWM timer
+ * 
+ * This function actually turns the hardware on or off. It manages both
+ * the timer (for PWM brightness control) and the basic on/off state.
+ * 
+ * @param should_be_on true if lights should be on, false if they should be off
+ */
+static void control_hardware_light(bool should_be_on);
+
+/**
+ * @brief Sets up the entire grow light system
+ * 
+ * This function is called once at startup to initialize everything:
+ * - Set up communication with the light sensor
+ * - Configure the pins that control our LED lights
+ * - Set up the timer for PWM brightness control
+ * - Create a scheduled task that will run our light control logic
+ */
 void grow_light_init();
 
-/// @brief Sets the brightness of the grow light.
-///
-/// The brightness value is clamped between the minimum and maximum brightness values. 
-/// If the brightness exceeds the maximum value, it is set to the maximum.
-/// If it is below the minimum value, it is set to the minimum.
-/// @param brightness The desired brightness level for the grow light.
-void grow_light_set_brightness(uint32_t);
-
-/// @brief Retrieves the current brightness of the grow light.
-///
-/// Used by the display and application to visualize the current brightness level of the growing lights.
-/// @return Current brightness level of the grow light.
+/**
+ * @brief Gets the current brightness level of our grow lights
+ * @return Current brightness value (0 = off, higher = brighter)
+ */
 uint32_t grow_light_get_brightness();
 
-/// @brief Sets the threshold for the grow light.
-/// If the manual mode is enabled, the threshold value is updated, else it remains unchanged.
-///
-/// Used by the option menu to set the threshold level for the grow light.
-/// @param new_threshold The new threshold value for the grow light.
-void grow_light_set_threshold(uint32_t);
-
-/// @brief Retrieves the current threshold for the grow light.
-/// Used by the option menu to visualize the current threshold level.
-/// @return The current threshold value for the grow light.
+/**
+ * @brief Gets the light threshold value
+ * @return Threshold value (when natural light is below this, our grow lights turn on)
+ */
 uint32_t grow_light_get_threshold();
 
-/// @brief Sets the mode of the grow light system.
-/// If manual mode is enabled, the grow light system will be handed to the user to perform manual adjustments.
-/// @param  manual_mode mode to set for the grow light system (true for manual mode, false for automatic mode).
-void grow_light_set_mode(int32_t);
-
-/// @brief Retrieves the current mode of the grow light system.
-/// @return current mode of opertion of the grow light system (true for manual mode, false for automatic mode).
-bool grow_light_get_mode();
-
-/// @brief Toggles the power state of the grow light.
-/// If the grow light is currently on, it will be turned off throught the GPIO pin, and vice versa.
-/// This function also updates the structure value to reflect the current power state of the grow light.
-void power_on_or_off(int32_t);
-
-/// @brief Indicates whether the grow light is currently turned on or off.
-/// @return true if the grow light is on, false if it is off.
+/**
+ * @brief Checks if the grow lights are currently on
+ * @return true if lights are on, false if they're off
+ */
 bool is_grow_light_on();
 
-/// @brief Updates the light intensity based on the sensor value.
-/// This function calculates the brightness level based on the sensor value and the threshold.
-/// If the sensor value is below the threshold, it calculates the brightness level and sets it.
-/// If the sensor value is above the threshold, it turns off the grow light and sets the intensity to 0.
-///
-/// @param sensor_val The current sensor value read from the OPT3001 light sensor.
-void update_light_intensity(uint32_t);
-#ifndef SOFTWARE_DEBUG
+/**
+ * @brief Checks if the system is in manual mode
+ * @return true if in manual mode (user controls lights), false if automatic mode
+ */
+bool grow_light_get_mode();
 
-/// @brief Updates the grow light system based on the ambient light sensor reading.
-/// This function reads the sensor value from the OPT3001 light sensor, calculates the brightness level,
-/// and updates the grow light system accordingly.
-/// If the sensor value is below the threshold, it turns on the grow light and sets the brightness.
-/// If the sensor value is above the threshold, it turns off the grow light and sets the brightness to 0.
+/**
+ * @brief Sets the brightness level of our grow lights
+ * 
+ * This function updates both our internal tracking and the actual hardware.
+ * It includes an optimization to avoid unnecessary updates.
+ * 
+ * @param brightness Desired brightness level (0 = off, higher = brighter)
+ */
+void grow_light_set_brightness(uint32_t brightness);
+
+/**
+ * @brief Sets the light threshold value (when to turn grow lights on/off)
+ * 
+ * The threshold determines at what natural light level our grow lights should activate.
+ * This function includes safety checks and only allows changes in manual mode.
+ * 
+ * @param new_threshold New threshold value to set
+ */
+void grow_light_set_threshold(uint32_t);
+
+/**
+ * @brief Switches between manual and automatic control modes
+ * 
+ * Manual mode: User has direct control over the lights
+ * Automatic mode: System automatically controls lights based on sensor readings
+ * 
+ * @param manual_mode 0 = automatic mode, any other value = manual mode
+ */
+void grow_light_set_mode(int32_t);
+
+/**
+ * @brief Sets the brightness level of our grow lights
+ * 
+ * This function updates both our internal tracking and the actual hardware.
+ * It includes an optimization to avoid unnecessary updates.
+ * 
+ * @param brightness Desired brightness level (0 = off, higher = brighter)
+ */
+void grow_light_set_brightness(uint32_t);
+
+/**
+ * @brief Gets the current brightness level of our grow lights
+ * @return Current brightness value (0 = off, higher = brighter)
+ */
+uint32_t grow_light_get_brightness();
+
+/**
+ * @brief Sets the light threshold value (when to turn grow lights on/off)
+ * 
+ * The threshold determines at what natural light level our grow lights should activate.
+ * This function includes safety checks and only allows changes in manual mode.
+ * 
+ * @param new_threshold New threshold value to set
+ */
+void grow_light_set_threshold(uint32_t);
+
+/**
+ * @brief Gets the light threshold value
+ * @return Threshold value (when natural light is below this, our grow lights turn on)
+ */
+uint32_t grow_light_get_threshold();
+
+/**
+ * @brief Switches between manual and automatic control modes
+ * 
+ * Manual mode: User has direct control over the lights
+ * Automatic mode: System automatically controls lights based on sensor readings
+ * 
+ * @param manual_mode 0 = automatic mode, any other value = manual mode
+ */
+void grow_light_set_mode(int32_t manual_mode);
+
+/**
+ * @brief Checks if the system is in manual mode
+ * @return true if in manual mode (user controls lights), false if automatic mode
+ */
+bool grow_light_get_mode();
+
+/**
+ * @brief Checks if the grow lights are currently on
+ * @return true if lights are on, false if they're off
+ */
+bool is_grow_light_on();
+
+/**
+ * @brief Manually turns the grow lights on or off
+ * 
+ * This function allows direct user control of the lights, but only works
+ * when the system is in manual mode. This prevents conflicts with automatic control.
+ * 
+ * @param on 0 = turn lights off, any other value = turn lights on
+ */
+void power_on_or_off(int32_t);
+
+#ifndef SOFTWARE_DEBUG
+/**
+ * @brief Main automatic light control function (runs on real hardware)
+ * 
+ * This function is called automatically every 10.5 seconds by the task scheduler.
+ * It reads the light sensor, calculates appropriate brightness, and controls the grow lights.
+ * This is the "brain" of our automatic lighting system.
+ */
 void update_light();
 #else
-
-/// @brief The hardware independent version of the update_light function
-///  which updates the grow light system based on the ambient light sensor reading.
-/// It takes values as a parameter and updates the grow light system accordingly.
-/// @param raw The raw sensor value read from the user in hexadecimal format.
+/**
+ * @brief Hardware-independent version of automatic light control (for testing/simulation)
+ * 
+ * This function does the same logic as update_light() but works without real hardware.
+ * It's used for testing our algorithms and debugging our code on a regular computer.
+ * 
+ * @param raw Simulated raw sensor value (normally this would come from the actual sensor)
+ */
 void update_light_hal(uint32_t);
 #endif
 
 #ifndef SOFTWARE_DEBUG
-/// @brief Updates the light timer with the specified time.
-/// This function sets the timer value for the grow light system, which determines how often the light system is updated.
-void update_light_timer(int32_t);
 
-/// @brief Timer_A1 interrupt handler for the grow light system.
-/// This function is called when the Timer_A1 interrupt occurs, toggling the LED state.
+/**
+ * @brief Interrupt handler for Timer_A1 (handles PWM timing)
+ * 
+ * This function is called automatically by the microcontroller hardware
+ * when timer events occur. It's responsible for creating the PWM signal
+ * that controls LED brightness by switching the lights on and off rapidly.
+ * 
+ * Interrupts are like "emergency phone calls" - the processor stops what
+ * it's doing to handle them immediately, then returns to normal operation.
+ */
 void TA1_N_IRQHandler(void);
+
+/**
+ * @brief Updates how often the automatic light control runs
+ * 
+ * This function allows changing the timing of our automatic light checking.
+ * By default, we check every 10.5 seconds, but this can be adjusted.
+ * 
+ * @param new_timer New interval in milliseconds (must be > 0)
+ */
+void update_light_timer(int32_t);
 #endif // end of if guard
 
 #endif // end of file guard

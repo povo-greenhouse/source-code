@@ -144,7 +144,7 @@ bool exceeding_threshold(){
 
 #ifndef SOFTWARE_DEBUG
 void update_air(){
-    send_data(1, 1, 0);
+
     // Commented to prevent collisions with the interrupt handler
     // Trigger a new ADC conversion
 //    ADC14_toggleConversionTrigger();
