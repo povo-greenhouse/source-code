@@ -78,7 +78,15 @@ Note: It is important to have a version <=12.1.0 for code compser studio, else t
 ---
 
 ## Project Layout
+
+### Circuit Layout
+
+<img width="714" height="605" alt="immagine" src="https://github.com/user-attachments/assets/0188dc64-c270-4f40-9efb-7275e1cf6a22" />
+
+### Code Layout
+
 Common directories you may find:
+
 ```                                                                                                                
 ├── LICENSE
 ├── MakeFile
