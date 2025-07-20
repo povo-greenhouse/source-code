@@ -80,8 +80,8 @@ Note: It is important to have a version <=12.1.0 for code compser studio, else t
 ## Project Layout
 
 ### Circuit Layout
+<img width="707" height="603" alt="immagine" src="https://github.com/user-attachments/assets/9106b39e-80e5-4e53-8ca3-75974ceaf914" />
 
-<img width="714" height="605" alt="immagine" src="https://github.com/user-attachments/assets/0188dc64-c270-4f40-9efb-7275e1cf6a22" />
 
 ### Code Layout
 
