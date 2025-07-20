@@ -34,12 +34,11 @@ void light_test_threshold_operations(){
 
     assert(grow_light_get_mode() == false);
 
-    int initial_threshold = grow_light_get_threshold();
-    grow_light_set_threshold(550);
-    assert(grow_light_get_threshold() == initial_threshold);
+    grow_light_set_threshold(50);
+    assert(grow_light_get_threshold() == MIN_BRIGHTNESS);
 
-    grow_light_set_threshold(3000);
-    assert(grow_light_get_threshold() == initial_threshold);
+    grow_light_set_threshold(10000);
+    assert(grow_light_get_threshold() == MAX_BRIGHTNESS);
 
     grow_light_set_mode(true);
     assert(grow_light_get_mode() == true);
@@ -48,10 +47,10 @@ void light_test_threshold_operations(){
     assert(grow_light_get_threshold() == 550);
 
     grow_light_set_threshold(6000);
-    assert(grow_light_get_threshold() == 3000);
+    assert(grow_light_get_threshold() == MAX_BRIGHTNESS);
 
     grow_light_set_threshold(0);
-    assert(grow_light_get_threshold() == 500);
+    assert(grow_light_get_threshold() == MIN_BRIGHTNESS);
 
     grow_light_set_threshold(1290);
     assert(grow_light_get_threshold() == 1290);
