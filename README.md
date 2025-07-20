@@ -1,4 +1,5 @@
 # Greenhouse Project
+
 Welcome to the source code repository for the Greenhouse Project! This project is intended for the course `Embedded Systems for the Internet of Things` offered by at the Università di Trento. It designed to automate and monitor greenhouse conditions for optimal plant growth. Below you'll find all the essential information to run, build, and understand the project.
 
 ## Table of Contents
