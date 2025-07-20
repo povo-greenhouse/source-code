@@ -95,10 +95,10 @@ void grow_light_init() {
     // STEP 4: Create and schedule the light update task
     // This task will run every 10.5 seconds to check light levels and adjust our grow lights
     STask light_task = {
-        .func = update_light,                // Function to call
-        .max_time = TASK_INTERVAL_MS,        // How often to run (10.5 seconds)
-        .time_until_process = TASK_INTERVAL_MS,  // Delay before first run
-        .active = true                       // Task is enabled
+        .fpointer = update_light,          // Function to call
+        .max_time = TASK_INTERVAL_MS,      // How often to run (10.5 seconds)
+        .elapsed_time = TASK_INTERVAL_MS,  // Delay before first run
+        .is_active = true                  // Task is enabled
     };
     
     // Add our task to the system scheduler and remember where it is
